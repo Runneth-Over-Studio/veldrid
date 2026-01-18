@@ -1,6 +1,6 @@
-﻿using NativeLibraryLoader;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using NativeLibrary = NativeLibraryLoader.NativeLibrary;
 
 namespace Veldrid.Sdl2
 {
