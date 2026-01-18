@@ -177,10 +177,6 @@ namespace Veldrid.Tests
             {
                 return; // TODO
             }
-            if (GD.BackendType == GraphicsBackend.Metal)
-            {
-                return; // TODO
-            }
 
             DeviceBuffer buffer = RF.CreateBuffer(new BufferDescription(1024, BufferUsage.Staging));
             MappedResourceView<int> view = GD.Map<int>(buffer, MapMode.ReadWrite);
@@ -207,10 +203,6 @@ namespace Veldrid.Tests
         public void Map_DifferentMode_Fails()
         {
             if (GD.BackendType == GraphicsBackend.Vulkan)
-            {
-                return; // TODO
-            }
-            if (GD.BackendType == GraphicsBackend.Metal)
             {
                 return; // TODO
             }

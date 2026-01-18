@@ -120,37 +120,6 @@ namespace Veldrid.Tests
             VeldridStartup.CreateWindowAndGraphicsDevice(wci, options, GraphicsBackend.OpenGLES, out window, out gd);
         }
 
-        public static GraphicsDevice CreateMetalDevice()
-        {
-            if (!GraphicsDevice.IsBackendSupported(GraphicsBackend.Metal))
-            {
-                Console.WriteLine("Metal is not supported on this system.");
-                return null;
-            }
-            return GraphicsDevice.CreateMetal(new GraphicsDeviceOptions(true, null, false, ResourceBindingModel.Improved));
-        }
-
-        public static void CreateMetalDeviceWithSwapchain(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            if (!InitializedSdl2)
-            {
-                window = null;
-                gd = null;
-                return;
-            }
-
-            WindowCreateInfo wci = new WindowCreateInfo
-            {
-                WindowWidth = 200,
-                WindowHeight = 200,
-                WindowInitialState = WindowState.Hidden,
-            };
-
-            GraphicsDeviceOptions options = new GraphicsDeviceOptions(true, PixelFormat.R16_UNorm, false, ResourceBindingModel.Improved);
-
-            VeldridStartup.CreateWindowAndGraphicsDevice(wci, options, GraphicsBackend.Metal, out window, out gd);
-        }
-
         internal static unsafe string GetString(byte* stringStart)
         {
             int characters = 0;
@@ -298,23 +267,6 @@ namespace Veldrid.Tests
         public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
         {
             TestUtils.CreateOpenGLESDevice(out window, out gd);
-        }
-    }
-
-    public class MetalDeviceCreator : GraphicsDeviceCreator
-    {
-        public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            window = null;
-            gd = TestUtils.CreateMetalDevice();
-        }
-    }
-
-    public class MetalDeviceCreatorWithMainSwapchain : GraphicsDeviceCreator
-    {
-        public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            TestUtils.CreateMetalDeviceWithSwapchain(out window, out gd);
         }
     }
 }

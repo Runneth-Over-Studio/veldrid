@@ -1,16 +1,14 @@
-﻿using static Veldrid.OpenGLBinding.OpenGLNative;
-using static Veldrid.OpenGL.OpenGLUtil;
-using System;
-using Veldrid.OpenGLBinding;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using Veldrid.OpenGL.EAGL;
-using static Veldrid.OpenGL.EGL.EGLNative;
-using NativeLibrary = NativeLibraryLoader.NativeLibrary;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Veldrid.OpenGLBinding;
+using static Veldrid.OpenGL.OpenGLUtil;
+using static Veldrid.OpenGLBinding.OpenGLNative;
+using NativeLibrary = NativeLibraryLoader.NativeLibrary;
 
 namespace Veldrid.OpenGL
 {
@@ -407,200 +405,13 @@ namespace Veldrid.OpenGL
             SwapchainSource source = swapchainDescription.Source;
             if (source is UIViewSwapchainSource uiViewSource)
             {
-                InitializeUIView(options, uiViewSource.UIView);
+                //InitializeUIView(options, uiViewSource.UIView);
             }
             else
             {
                 throw new VeldridException(
                     "This function does not support creating an OpenGLES GraphicsDevice with the given SwapchainSource.");
             }
-        }
-
-        private void InitializeUIView(GraphicsDeviceOptions options, IntPtr uIViewPtr)
-        {
-            EAGLContext eaglContext = EAGLContext.Create(EAGLRenderingAPI.OpenGLES3);
-            if (!EAGLContext.setCurrentContext(eaglContext.NativePtr))
-            {
-                throw new VeldridException("Unable to make newly-created EAGLContext current.");
-            }
-
-            MetalBindings.UIView uiView = new MetalBindings.UIView(uIViewPtr);
-
-            CAEAGLLayer eaglLayer = CAEAGLLayer.New();
-            eaglLayer.opaque = true;
-            eaglLayer.frame = uiView.frame;
-            uiView.layer.addSublayer(eaglLayer.NativePtr);
-
-            NativeLibrary glesLibrary = new NativeLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
-
-            Func<string, IntPtr> getProcAddress = name => glesLibrary.LoadFunction(name);
-
-            LoadAllFunctions(eaglContext.NativePtr, getProcAddress, true);
-
-            glGenFramebuffers(1, out uint fb);
-            CheckLastError();
-            glBindFramebuffer(FramebufferTarget.Framebuffer, fb);
-            CheckLastError();
-
-            glGenRenderbuffers(1, out uint colorRB);
-            CheckLastError();
-
-            glBindRenderbuffer(RenderbufferTarget.Renderbuffer, colorRB);
-            CheckLastError();
-
-            bool result = eaglContext.renderBufferStorage((UIntPtr)RenderbufferTarget.Renderbuffer, eaglLayer.NativePtr);
-            if (!result)
-            {
-                throw new VeldridException($"Failed to associate OpenGLES Renderbuffer with CAEAGLLayer.");
-            }
-
-            glGetRenderbufferParameteriv(
-                RenderbufferTarget.Renderbuffer,
-                RenderbufferPname.RenderbufferWidth,
-                out int fbWidth);
-            CheckLastError();
-
-            glGetRenderbufferParameteriv(
-                RenderbufferTarget.Renderbuffer,
-                RenderbufferPname.RenderbufferHeight,
-                out int fbHeight);
-            CheckLastError();
-
-            glFramebufferRenderbuffer(
-                FramebufferTarget.Framebuffer,
-                GLFramebufferAttachment.ColorAttachment0,
-                RenderbufferTarget.Renderbuffer,
-                colorRB);
-            CheckLastError();
-
-            uint depthRB = 0;
-            bool hasDepth = options.SwapchainDepthFormat != null;
-            if (hasDepth)
-            {
-                glGenRenderbuffers(1, out depthRB);
-                CheckLastError();
-
-                glBindRenderbuffer(RenderbufferTarget.Renderbuffer, depthRB);
-                CheckLastError();
-
-                glRenderbufferStorage(
-                    RenderbufferTarget.Renderbuffer,
-                    (uint)OpenGLFormats.VdToGLSizedInternalFormat(options.SwapchainDepthFormat.Value, true),
-                    (uint)fbWidth,
-                    (uint)fbHeight);
-                CheckLastError();
-
-                glFramebufferRenderbuffer(
-                    FramebufferTarget.Framebuffer,
-                    GLFramebufferAttachment.DepthAttachment,
-                    RenderbufferTarget.Renderbuffer,
-                    depthRB);
-                CheckLastError();
-            }
-
-            FramebufferErrorCode status = glCheckFramebufferStatus(FramebufferTarget.Framebuffer);
-            CheckLastError();
-            if (status != FramebufferErrorCode.FramebufferComplete)
-            {
-                throw new VeldridException($"The OpenGLES main Swapchain Framebuffer was incomplete after initialization.");
-            }
-
-            glBindFramebuffer(FramebufferTarget.Framebuffer, fb);
-            CheckLastError();
-
-            Action<IntPtr> setCurrentContext = ctx =>
-            {
-                if (!EAGLContext.setCurrentContext(ctx))
-                {
-                    throw new VeldridException($"Unable to set the thread's current GL context.");
-                }
-            };
-
-            Action swapBuffers = () =>
-            {
-                glBindRenderbuffer(RenderbufferTarget.Renderbuffer, colorRB);
-                CheckLastError();
-
-                bool presentResult = eaglContext.presentRenderBuffer((UIntPtr)RenderbufferTarget.Renderbuffer);
-                CheckLastError();
-                if (!presentResult)
-                {
-                    throw new VeldridException($"Failed to present the EAGL RenderBuffer.");
-                }
-            };
-
-            Action setSwapchainFramebuffer = () =>
-            {
-                glBindFramebuffer(FramebufferTarget.Framebuffer, fb);
-                CheckLastError();
-            };
-
-            Action<uint, uint> resizeSwapchain = (w, h) =>
-            {
-                eaglLayer.frame = uiView.frame;
-
-                _executionThread.Run(() =>
-                {
-                    glBindRenderbuffer(RenderbufferTarget.Renderbuffer, colorRB);
-                    CheckLastError();
-
-                    bool rbStorageResult = eaglContext.renderBufferStorage(
-                        (UIntPtr)RenderbufferTarget.Renderbuffer,
-                        eaglLayer.NativePtr);
-                    if (!rbStorageResult)
-                    {
-                        throw new VeldridException($"Failed to associate OpenGLES Renderbuffer with CAEAGLLayer.");
-                    }
-
-                    glGetRenderbufferParameteriv(
-                        RenderbufferTarget.Renderbuffer,
-                        RenderbufferPname.RenderbufferWidth,
-                        out int newWidth);
-                    CheckLastError();
-
-                    glGetRenderbufferParameteriv(
-                        RenderbufferTarget.Renderbuffer,
-                        RenderbufferPname.RenderbufferHeight,
-                        out int newHeight);
-                    CheckLastError();
-
-                    if (hasDepth)
-                    {
-                        Debug.Assert(depthRB != 0);
-                        glBindRenderbuffer(RenderbufferTarget.Renderbuffer, depthRB);
-                        CheckLastError();
-
-                        glRenderbufferStorage(
-                            RenderbufferTarget.Renderbuffer,
-                            (uint)OpenGLFormats.VdToGLSizedInternalFormat(options.SwapchainDepthFormat.Value, true),
-                            (uint)newWidth,
-                            (uint)newHeight);
-                        CheckLastError();
-                    }
-                });
-            };
-
-            Action<IntPtr> destroyContext = ctx =>
-            {
-                eaglLayer.removeFromSuperlayer();
-                eaglLayer.Release();
-                eaglContext.Release();
-                glesLibrary.Dispose();
-            };
-
-            OpenGLPlatformInfo platformInfo = new OpenGLPlatformInfo(
-                eaglContext.NativePtr,
-                getProcAddress,
-                setCurrentContext,
-                () => EAGLContext.currentContext.NativePtr,
-                () => setCurrentContext(IntPtr.Zero),
-                destroyContext,
-                swapBuffers,
-                syncInterval => { },
-                setSwapchainFramebuffer,
-                resizeSwapchain);
-
-            Init(options, platformInfo, (uint)fbWidth, (uint)fbHeight, false);
         }
 
         private static int GetDepthBits(PixelFormat value)

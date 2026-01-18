@@ -119,12 +119,6 @@ namespace Veldrid.StartupUtilities
 #else
                     throw new VeldridException("OpenGL support has not been included in this configuration of Veldrid");
 #endif
-                case GraphicsBackend.Metal:
-#if !EXCLUDE_METAL_BACKEND
-                    return CreateMetalGraphicsDevice(options, window);
-#else
-                    throw new VeldridException("Metal support has not been included in this configuration of Veldrid");
-#endif
                 case GraphicsBackend.OpenGLES:
 #if !EXCLUDE_OPENGL_BACKEND
                     return CreateDefaultOpenGLGraphicsDevice(options, window, preferredBackend);
@@ -164,26 +158,6 @@ namespace Veldrid.StartupUtilities
             }
         }
 
-#if !EXCLUDE_METAL_BACKEND
-        private static unsafe GraphicsDevice CreateMetalGraphicsDevice(GraphicsDeviceOptions options, Sdl2Window window)
-            => CreateMetalGraphicsDevice(options, window, options.SwapchainSrgbFormat);
-        private static unsafe GraphicsDevice CreateMetalGraphicsDevice(
-            GraphicsDeviceOptions options,
-            Sdl2Window window,
-            bool colorSrgb)
-        {
-            SwapchainSource source = GetSwapchainSource(window);
-            SwapchainDescription swapchainDesc = new SwapchainDescription(
-                source,
-                (uint)window.Width, (uint)window.Height,
-                options.SwapchainDepthFormat,
-                options.SyncToVerticalBlank,
-                colorSrgb);
-
-            return GraphicsDevice.CreateMetal(options, swapchainDesc);
-        }
-#endif
-
         public static GraphicsBackend GetPlatformDefaultBackend()
         {
             return GraphicsBackend.Vulkan;
@@ -194,15 +168,15 @@ namespace Veldrid.StartupUtilities
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return GraphicsDevice.IsBackendSupported(GraphicsBackend.Metal)
-                    ? GraphicsBackend.Metal
-                    : GraphicsBackend.OpenGL;
+                return GraphicsDevice.IsBackendSupported(GraphicsBackend.OpenGL)
+                    ? GraphicsBackend.OpenGL
+                    : throw new PlatformNotSupportedException("Without OpenGL support, OSX is not supported.");
             }
             else
             {
                 return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
                     ? GraphicsBackend.Vulkan
-                    : GraphicsBackend.OpenGL;
+                    : throw new PlatformNotSupportedException("OS Platform is not supported graphically.");
             }
         }
 
