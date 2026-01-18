@@ -1,8 +1,7 @@
-﻿using Vulkan;
-using static Vulkan.VulkanNative;
+﻿using System.Diagnostics;
+using Vulkan;
 using static Veldrid.Vk.VulkanUtil;
-using System.Diagnostics;
-using System;
+using static Vulkan.VulkanNative;
 
 namespace Veldrid.Vk
 {

@@ -1,5 +1,4 @@
 ﻿using Vulkan;
-using static Veldrid.Vk.VulkanUtil;
 using static Vulkan.VulkanNative;
 
 namespace Veldrid.Vk

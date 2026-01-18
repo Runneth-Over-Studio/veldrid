@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Vulkan;
 using static Vulkan.VulkanNative;
-using static Veldrid.Vk.VulkanUtil;
 
 namespace Veldrid.Vk
 {

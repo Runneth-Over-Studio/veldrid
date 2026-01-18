@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Vulkan;
-using static Vulkan.VulkanNative;
-using static Veldrid.Vk.VulkanUtil;
-using System;
 using System.Diagnostics;
+using Vulkan;
+using static Veldrid.Vk.VulkanUtil;
+using static Vulkan.VulkanNative;
 
 namespace Veldrid.Vk
 {

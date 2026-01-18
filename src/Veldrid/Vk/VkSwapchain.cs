@@ -1,9 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Vulkan;
-using static Vulkan.VulkanNative;
 using static Veldrid.Vk.VulkanUtil;
-using System;
-using System.Runtime.InteropServices;
+using static Vulkan.VulkanNative;
 
 namespace Veldrid.Vk
 {
