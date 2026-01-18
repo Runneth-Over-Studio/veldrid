@@ -216,8 +216,4 @@ namespace Veldrid.Tests
     [Trait("Backend", "Vulkan")]
     public class VulkanResourceSetTests : ResourceSetTests<VulkanDeviceCreator> { }
 #endif
-#if TEST_D3D11
-    [Trait("Backend", "D3D11")]
-    public class D3D11ResourceSetTests : ResourceSetTests<D3D11DeviceCreator> { }
-#endif
 }

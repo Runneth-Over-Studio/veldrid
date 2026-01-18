@@ -259,10 +259,6 @@ namespace Veldrid.NeoDemo
                         {
                             ChangeBackend(GraphicsBackend.Vulkan);
                         }
-                        if (ImGui.MenuItem("Direct3D 11", string.Empty, _gd.BackendType == GraphicsBackend.Direct3D11, GraphicsDevice.IsBackendSupported(GraphicsBackend.Direct3D11)))
-                        {
-                            ChangeBackend(GraphicsBackend.Direct3D11);
-                        }
                         ImGui.EndMenu();
                     }
                     if (ImGui.BeginMenu("MSAA"))

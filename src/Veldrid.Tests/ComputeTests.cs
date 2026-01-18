@@ -245,7 +245,6 @@ void main()
         public void ComputeCubemapGeneration()
         {
             Skip.IfNot(GD.Features.ComputeShader);
-            Skip.If(GD.GetD3D11Info(out _), "D3D11 doesn't support Storage Cubemaps");
 
             const int TexSize = 32;
             const uint MipLevels = 1;
@@ -310,7 +309,6 @@ void main()
         public void ComputeCubemapBindSingleTextureMipLevelOutput()
         {
             Skip.IfNot(GD.Features.ComputeShader);
-            Skip.If(GD.GetD3D11Info(out _), "D3D11 doesn't support Storage Cubemaps");
 
             const int TexSize = 128;
             const uint MipLevels = 7;
@@ -529,9 +527,5 @@ void main()
 #if TEST_VULKAN
     [Trait("Backend", "Vulkan")]
     public class VulkanComputeTests : ComputeTests<VulkanDeviceCreatorWithMainSwapchain> { }
-#endif
-#if TEST_D3D11
-    [Trait("Backend", "D3D11")]
-    public class D3D11ComputeTests : ComputeTests<D3D11DeviceCreatorWithMainSwapchain> { }
 #endif
 }

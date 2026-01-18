@@ -52,32 +52,6 @@ namespace Veldrid.Tests
             VeldridStartup.CreateWindowAndGraphicsDevice(wci, options, GraphicsBackend.Vulkan, out window, out gd);
         }
 
-        public static GraphicsDevice CreateD3D11Device()
-        {
-            return GraphicsDevice.CreateD3D11(new GraphicsDeviceOptions(true));
-        }
-
-        public static void CreateD3D11DeviceWithSwapchain(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            if (!InitializedSdl2)
-            {
-                window = null;
-                gd = null;
-                return;
-            }
-
-            WindowCreateInfo wci = new WindowCreateInfo
-            {
-                WindowWidth = 200,
-                WindowHeight = 200,
-                WindowInitialState = WindowState.Hidden,
-            };
-
-            GraphicsDeviceOptions options = new GraphicsDeviceOptions(true, PixelFormat.R16_UNorm, false);
-
-            VeldridStartup.CreateWindowAndGraphicsDevice(wci, options, GraphicsBackend.Direct3D11, out window, out gd);
-        }
-
         internal static unsafe string GetString(byte* stringStart)
         {
             int characters = 0;
@@ -192,23 +166,6 @@ namespace Veldrid.Tests
         public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
         {
             TestUtils.CreateVulkanDeviceWithSwapchain(out window, out gd);
-        }
-    }
-
-    public class D3D11DeviceCreator : GraphicsDeviceCreator
-    {
-        public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            window = null;
-            gd = TestUtils.CreateD3D11Device();
-        }
-    }
-
-    public class D3D11DeviceCreatorWithMainSwapchain : GraphicsDeviceCreator
-    {
-        public unsafe void CreateGraphicsDevice(out Sdl2Window window, out GraphicsDevice gd)
-        {
-            TestUtils.CreateD3D11DeviceWithSwapchain(out window, out gd);
         }
     }
 }

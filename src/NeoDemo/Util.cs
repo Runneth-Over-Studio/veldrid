@@ -1,6 +1,4 @@
-﻿using ImGuiNET;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Veldrid.Utilities;

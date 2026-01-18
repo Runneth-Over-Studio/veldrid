@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using Veldrid.Sdl2;
 
@@ -97,12 +96,6 @@ namespace Veldrid.StartupUtilities
         {
             switch (preferredBackend)
             {
-                case GraphicsBackend.Direct3D11:
-#if !EXCLUDE_D3D11_BACKEND
-                    return CreateDefaultD3D11GraphicsDevice(options, window);
-#else
-                    throw new VeldridException("D3D11 support has not been included in this configuration of Veldrid");
-#endif
                 case GraphicsBackend.Vulkan:
 #if !EXCLUDE_VULKAN_BACKEND
                     return CreateVulkanGraphicsDevice(options, window);
@@ -185,23 +178,6 @@ namespace Veldrid.StartupUtilities
         }
 #endif
 
-#if !EXCLUDE_D3D11_BACKEND
-        public static GraphicsDevice CreateDefaultD3D11GraphicsDevice(
-            GraphicsDeviceOptions options,
-            Sdl2Window window)
-        {
-            SwapchainSource source = GetSwapchainSource(window);
-            SwapchainDescription swapchainDesc = new SwapchainDescription(
-                source,
-                (uint)window.Width, (uint)window.Height,
-                options.SwapchainDepthFormat,
-                options.SyncToVerticalBlank,
-                options.SwapchainSrgbFormat);
-
-            return GraphicsDevice.CreateD3D11(options, swapchainDesc);
-        }
-#endif
-
         private static unsafe string GetString(byte* stringStart)
         {
             int characters = 0;
@@ -212,83 +188,5 @@ namespace Veldrid.StartupUtilities
 
             return Encoding.UTF8.GetString(stringStart, characters);
         }
-
-#if !EXCLUDE_OPENGL_BACKEND
-        private static readonly object s_glVersionLock = new object();
-        private static (int Major, int Minor)? s_maxSupportedGLVersion;
-        private static (int Major, int Minor)? s_maxSupportedGLESVersion;
-
-        private static (int Major, int Minor) GetMaxGLVersion(bool gles)
-        {
-            lock (s_glVersionLock)
-            {
-                (int Major, int Minor)? maxVer = gles ? s_maxSupportedGLESVersion : s_maxSupportedGLVersion;
-                if (maxVer == null)
-                {
-                    maxVer = TestMaxVersion(gles);
-                    if (gles) { s_maxSupportedGLESVersion = maxVer; }
-                    else { s_maxSupportedGLVersion = maxVer; }
-                }
-
-                return maxVer.Value;
-            }
-        }
-
-        private static (int Major, int Minor) TestMaxVersion(bool gles)
-        {
-            (int, int)[] testVersions = gles
-                ? new[] { (3, 2), (3, 0) }
-                : new[] { (4, 6), (4, 3), (4, 0), (3, 3), (3, 0) };
-
-            foreach ((int major, int minor) in testVersions)
-            {
-                if (TestIndividualGLVersion(gles, major, minor)) { return (major, minor); }
-            }
-
-            return (0, 0);
-        }
-
-        private static unsafe bool TestIndividualGLVersion(bool gles, int major, int minor)
-        {
-            SDL_GLProfile profileMask = gles ? SDL_GLProfile.ES : SDL_GLProfile.Core;
-
-            Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextProfileMask, (int)profileMask);
-            Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMajorVersion, major);
-            Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMinorVersion, minor);
-
-            SDL_Window window = Sdl2Native.SDL_CreateWindow(
-                string.Empty,
-                0, 0,
-                1, 1,
-                SDL_WindowFlags.Hidden | SDL_WindowFlags.OpenGL);
-            byte* error = Sdl2Native.SDL_GetError();
-            string errorString = GetString(error);
-
-            if (window.NativePointer == IntPtr.Zero || !string.IsNullOrEmpty(errorString))
-            {
-                Sdl2Native.SDL_ClearError();
-                Debug.WriteLine($"Unable to create version {major}.{minor} {profileMask} context.");
-                return false;
-            }
-
-            IntPtr context = Sdl2Native.SDL_GL_CreateContext(window);
-            error = Sdl2Native.SDL_GetError();
-            if (error != null)
-            {
-                errorString = GetString(error);
-                if (!string.IsNullOrEmpty(errorString))
-                {
-                    Sdl2Native.SDL_ClearError();
-                    Debug.WriteLine($"Unable to create version {major}.{minor} {profileMask} context.");
-                    Sdl2Native.SDL_DestroyWindow(window);
-                    return false;
-                }
-            }
-
-            Sdl2Native.SDL_GL_DeleteContext(context);
-            Sdl2Native.SDL_DestroyWindow(window);
-            return true;
-        }
-#endif
     }
 }

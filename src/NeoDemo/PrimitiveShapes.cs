@@ -1,8 +1,4 @@
-﻿using System;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Veldrid;
+﻿using System.Numerics;
 using Veldrid.Utilities;
 
 namespace Veldrid.NeoDemo

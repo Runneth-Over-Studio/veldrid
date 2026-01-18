@@ -858,31 +858,6 @@ namespace Veldrid
             PlatformDispose();
         }
 
-#if !EXCLUDE_D3D11_BACKEND
-        /// <summary>
-        /// Tries to get a <see cref="BackendInfoD3D11"/> for this instance. This method will only succeed if this is a D3D11
-        /// GraphicsDevice.
-        /// </summary>
-        /// <param name="info">If successful, this will contain the <see cref="BackendInfoD3D11"/> for this instance.</param>
-        /// <returns>True if this is a D3D11 GraphicsDevice and the operation was successful. False otherwise.</returns>
-        public virtual bool GetD3D11Info(out BackendInfoD3D11 info) { info = null; return false; }
-
-        /// <summary>
-        /// Gets a <see cref="BackendInfoD3D11"/> for this instance. This method will only succeed if this is a D3D11
-        /// GraphicsDevice. Otherwise, this method will throw an exception.
-        /// </summary>
-        /// <returns>The <see cref="BackendInfoD3D11"/> for this instance.</returns>
-        public BackendInfoD3D11 GetD3D11Info()
-        {
-            if (!GetD3D11Info(out BackendInfoD3D11 info))
-            {
-                throw new VeldridException($"{nameof(GetD3D11Info)} can only be used on a D3D11 GraphicsDevice.");
-            }
-
-            return info;
-        }
-#endif
-
 #if !EXCLUDE_VULKAN_BACKEND
         /// <summary>
         /// Tries to get a <see cref="BackendInfoVulkan"/> for this instance. This method will only succeed if this is a Vulkan
@@ -917,12 +892,6 @@ namespace Veldrid
         {
             switch (backend)
             {
-                case GraphicsBackend.Direct3D11:
-#if !EXCLUDE_D3D11_BACKEND
-                    return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#else
-                    return false;
-#endif
                 case GraphicsBackend.Vulkan:
 #if !EXCLUDE_VULKAN_BACKEND
                     return Vk.VkGraphicsDevice.IsSupported();
@@ -933,101 +902,6 @@ namespace Veldrid
                     throw Illegal.Value<GraphicsBackend>();
             }
         }
-
-#if !EXCLUDE_D3D11_BACKEND
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-        public static GraphicsDevice CreateD3D11(GraphicsDeviceOptions options)
-        {
-            return new D3D11.D3D11GraphicsDevice(options, new D3D11DeviceOptions(), null);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11, with a main Swapchain.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="swapchainDescription">A description of the main Swapchain to create.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-        public static GraphicsDevice CreateD3D11(GraphicsDeviceOptions options, SwapchainDescription swapchainDescription)
-        {
-            return new D3D11.D3D11GraphicsDevice(options, new D3D11DeviceOptions(), swapchainDescription);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="d3d11Options">The Direct3D11-specific options used to create the device.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-        public static GraphicsDevice CreateD3D11(GraphicsDeviceOptions options, D3D11DeviceOptions d3d11Options)
-        {
-            return new D3D11.D3D11GraphicsDevice(options, d3d11Options, null);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11, with a main Swapchain.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="d3d11Options">The Direct3D11-specific options used to create the device.</param>
-        /// <param name="swapchainDescription">A description of the main Swapchain to create.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-        public static GraphicsDevice CreateD3D11(GraphicsDeviceOptions options, D3D11DeviceOptions d3d11Options, SwapchainDescription swapchainDescription)
-        {
-            return new D3D11.D3D11GraphicsDevice(options, d3d11Options, swapchainDescription);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11, with a main Swapchain.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="hwnd">The Win32 window handle to render into.</param>
-        /// <param name="width">The initial width of the window.</param>
-        /// <param name="height">The initial height of the window.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-        public static GraphicsDevice CreateD3D11(GraphicsDeviceOptions options, IntPtr hwnd, uint width, uint height)
-        {
-            SwapchainDescription swapchainDescription = new SwapchainDescription(
-                SwapchainSource.CreateWin32(hwnd, IntPtr.Zero),
-                width, height,
-                options.SwapchainDepthFormat,
-                options.SyncToVerticalBlank,
-                options.SwapchainSrgbFormat);
-
-            return new D3D11.D3D11GraphicsDevice(options, new D3D11DeviceOptions(), swapchainDescription);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11, with a main Swapchain.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="swapChainPanel">A COM object which must implement the <see cref="Vortice.DXGI.ISwapChainPanelNative"/>
-        /// or <see cref="Vortice.DXGI.ISwapChainBackgroundPanelNative"/> interface. Generally, this should be a SwapChainPanel
-        /// or SwapChainBackgroundPanel contained in your application window.</param>
-        /// <param name="renderWidth">The renderable width of the swapchain panel.</param>
-        /// <param name="renderHeight">The renderable height of the swapchain panel.</param>
-        /// <param name="logicalDpi">The logical DPI of the swapchain panel.</param>
-        /// <returns></returns>
-        public static GraphicsDevice CreateD3D11(
-            GraphicsDeviceOptions options,
-            object swapChainPanel,
-            double renderWidth,
-            double renderHeight,
-            float logicalDpi)
-        {
-            SwapchainDescription swapchainDescription = new SwapchainDescription(
-                SwapchainSource.CreateUwp(swapChainPanel, logicalDpi),
-                (uint)renderWidth,
-                (uint)renderHeight,
-                options.SwapchainDepthFormat,
-                options.SyncToVerticalBlank,
-                options.SwapchainSrgbFormat);
-
-            return new D3D11.D3D11GraphicsDevice(options, new D3D11DeviceOptions(), swapchainDescription);
-        }
-#endif
 
 #if !EXCLUDE_VULKAN_BACKEND
         /// <summary>

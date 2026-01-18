@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Veldrid.SPIRV;
 
 namespace Veldrid.NeoDemo
 {
@@ -18,13 +17,8 @@ namespace Veldrid.NeoDemo
 #if DEBUG
             debug = true;
 #endif
-            Shader[] shaders = factory.CreateFromSpirv(
-                new ShaderDescription(ShaderStages.Vertex, vsBytes, "main", debug),
-                new ShaderDescription(ShaderStages.Fragment, fsBytes, "main", debug),
-                GetOptions(gd));
-
-            Shader vs = shaders[0];
-            Shader fs = shaders[1];
+            Shader vs = factory.CreateShader(new ShaderDescription(ShaderStages.Vertex, vsBytes, "main", debug));
+            Shader fs = factory.CreateShader(new ShaderDescription(ShaderStages.Fragment, fsBytes, "main", debug));
 
             vs.Name = setName + "-Vertex";
             fs.Name = setName + "-Fragment";
@@ -32,24 +26,16 @@ namespace Veldrid.NeoDemo
             return (vs, fs);
         }
 
-        private static CrossCompileOptions GetOptions(GraphicsDevice gd)
-        {
-            SpecializationConstant[] specializations = GetSpecializations(gd);
-
-            bool fixClipZ = !gd.IsDepthRangeZeroToOne;
-            bool invertY = false;
-
-            return new CrossCompileOptions(fixClipZ, invertY, specializations);
-        }
-
         public static SpecializationConstant[] GetSpecializations(GraphicsDevice gd)
         {
             bool glOrGles = false;
 
-            List<SpecializationConstant> specializations = new List<SpecializationConstant>();
-            specializations.Add(new SpecializationConstant(100, gd.IsClipSpaceYInverted));
-            specializations.Add(new SpecializationConstant(101, glOrGles)); // TextureCoordinatesInvertedY
-            specializations.Add(new SpecializationConstant(102, gd.IsDepthRangeZeroToOne));
+            List<SpecializationConstant> specializations =
+            [
+                new SpecializationConstant(100, gd.IsClipSpaceYInverted),
+                new SpecializationConstant(101, glOrGles), // TextureCoordinatesInvertedY
+                new SpecializationConstant(102, gd.IsDepthRangeZeroToOne),
+            ];
 
             PixelFormat swapchainFormat = gd.MainSwapchain.Framebuffer.OutputDescription.ColorAttachments[0].Format;
             bool swapchainIsSrgb = swapchainFormat == PixelFormat.B8_G8_R8_A8_UNorm_SRgb
@@ -64,13 +50,30 @@ namespace Veldrid.NeoDemo
             string stageExt = stage == ShaderStages.Vertex ? "vert" : "frag";
             string name = setName + "." + stageExt;
 
-            if (backend == GraphicsBackend.Vulkan || backend == GraphicsBackend.Direct3D11)
+            if (backend == GraphicsBackend.Vulkan)
             {
                 string bytecodeExtension = GetBytecodeExtension(backend);
                 string bytecodePath = AssetHelper.GetPath(Path.Combine("Shaders", name + bytecodeExtension));
+
                 if (File.Exists(bytecodePath))
                 {
-                    return File.ReadAllBytes(bytecodePath);
+                    byte[] bytes = File.ReadAllBytes(bytecodePath);
+
+                    if (bytes.Length >= 4)
+                    {
+                        uint magicNumber = BitConverter.ToUInt32(bytes, 0);
+                        if (magicNumber != 0x07230203)
+                        {
+                            throw new InvalidOperationException($"File {bytecodePath} is not valid SPIR-V (magic number: 0x{magicNumber:X8})");
+                        }
+                    }
+                    return bytes;
+                }
+                else
+                {
+                    throw new FileNotFoundException(
+                        $"Expected SPIR-V file not found: {bytecodePath}. " +
+                        $"Ensure shaders are compiled to .spv format for Vulkan.");
                 }
             }
 
@@ -83,7 +86,6 @@ namespace Veldrid.NeoDemo
         {
             switch (backend)
             {
-                case GraphicsBackend.Direct3D11: return ".hlsl.bytes";
                 case GraphicsBackend.Vulkan: return ".spv";
                 default: throw new InvalidOperationException("Invalid Graphics backend: " + backend);
             }
@@ -93,7 +95,6 @@ namespace Veldrid.NeoDemo
         {
             switch (backend)
             {
-                case GraphicsBackend.Direct3D11: return ".hlsl";
                 case GraphicsBackend.Vulkan: return ".450.glsl";
                 default: throw new InvalidOperationException("Invalid Graphics backend: " + backend);
             }

@@ -261,12 +261,6 @@ namespace Veldrid
         {
             switch (factory.BackendType)
             {
-                case GraphicsBackend.Direct3D11:
-                {
-                    if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
-                    string resourceName = name + ".hlsl.bytes";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
                 case GraphicsBackend.Vulkan:
                 {
                     string resourceName = name + ".spv";

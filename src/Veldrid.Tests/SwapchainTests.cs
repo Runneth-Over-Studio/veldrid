@@ -69,10 +69,4 @@ namespace Veldrid.Tests
     [Trait("Backend", "Vulkan")]
     public class VulkanMainSwapchainTests : MainSwapchainTests<VulkanDeviceCreatorWithMainSwapchain> { }
 #endif
-#if TEST_D3D11
-    [Trait("Backend", "D3D11")]
-    public class D3D11SwapchainTests : SwapchainTests<D3D11DeviceCreator> { }
-    [Trait("Backend", "D3D11")]
-    public class D3D11MainSwapchainTests : MainSwapchainTests<D3D11DeviceCreatorWithMainSwapchain> { }
-#endif
 }
