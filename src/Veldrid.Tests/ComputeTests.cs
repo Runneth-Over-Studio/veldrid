@@ -526,14 +526,6 @@ void main()
         }
     }
 
-#if TEST_OPENGL
-    [Trait("Backend", "OpenGL")]
-    public class OpenGLComputeTests : ComputeTests<OpenGLDeviceCreator> { }
-#endif
-#if TEST_OPENGLES
-    [Trait("Backend", "OpenGLES")]
-    public class OpenGLESComputeTests : ComputeTests<OpenGLESDeviceCreator> { }
-#endif
 #if TEST_VULKAN
     [Trait("Backend", "Vulkan")]
     public class VulkanComputeTests : ComputeTests<VulkanDeviceCreatorWithMainSwapchain> { }
@@ -541,9 +533,5 @@ void main()
 #if TEST_D3D11
     [Trait("Backend", "D3D11")]
     public class D3D11ComputeTests : ComputeTests<D3D11DeviceCreatorWithMainSwapchain> { }
-#endif
-#if TEST_METAL
-    [Trait("Backend", "Metal")]
-    public class MetalComputeTests : RenderTests<MetalDeviceCreator> { }
 #endif
 }

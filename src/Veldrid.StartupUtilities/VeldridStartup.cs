@@ -35,10 +35,6 @@ namespace Veldrid.StartupUtilities
             out GraphicsDevice gd)
         {
             Sdl2Native.SDL_Init(SDLInitFlags.Video);
-            if (preferredBackend == GraphicsBackend.OpenGL || preferredBackend == GraphicsBackend.OpenGLES)
-            {
-                SetSDLGLContextAttributes(deviceOptions, preferredBackend);
-            }
 
             window = CreateWindow(ref windowCI);
             gd = CreateGraphicsDevice(window, deviceOptions, preferredBackend);
@@ -113,18 +109,6 @@ namespace Veldrid.StartupUtilities
 #else
                     throw new VeldridException("Vulkan support has not been included in this configuration of Veldrid");
 #endif
-                case GraphicsBackend.OpenGL:
-#if !EXCLUDE_OPENGL_BACKEND
-                    return CreateDefaultOpenGLGraphicsDevice(options, window, preferredBackend);
-#else
-                    throw new VeldridException("OpenGL support has not been included in this configuration of Veldrid");
-#endif
-                case GraphicsBackend.OpenGLES:
-#if !EXCLUDE_OPENGL_BACKEND
-                    return CreateDefaultOpenGLGraphicsDevice(options, window, preferredBackend);
-#else
-                    throw new VeldridException("OpenGL support has not been included in this configuration of Veldrid");
-#endif
                 default:
                     throw new VeldridException("Invalid GraphicsBackend: " + preferredBackend);
             }
@@ -161,23 +145,6 @@ namespace Veldrid.StartupUtilities
         public static GraphicsBackend GetPlatformDefaultBackend()
         {
             return GraphicsBackend.Vulkan;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return GraphicsBackend.Direct3D11;
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                return GraphicsDevice.IsBackendSupported(GraphicsBackend.OpenGL)
-                    ? GraphicsBackend.OpenGL
-                    : throw new PlatformNotSupportedException("Without OpenGL support, OSX is not supported.");
-            }
-            else
-            {
-                return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
-                    ? GraphicsBackend.Vulkan
-                    : throw new PlatformNotSupportedException("OS Platform is not supported graphically.");
-            }
         }
 
 #if !EXCLUDE_VULKAN_BACKEND
@@ -214,125 +181,6 @@ namespace Veldrid.StartupUtilities
                         new Vulkan.Xlib.Window() { Value = x11Info.Sdl2Window });
                 default:
                     throw new PlatformNotSupportedException("Cannot create a Vulkan surface for " + sysWmInfo.subsystem + ".");
-            }
-        }
-#endif
-
-#if !EXCLUDE_OPENGL_BACKEND
-        public static unsafe GraphicsDevice CreateDefaultOpenGLGraphicsDevice(
-            GraphicsDeviceOptions options,
-            Sdl2Window window,
-            GraphicsBackend backend)
-        {
-            Sdl2Native.SDL_ClearError();
-            IntPtr sdlHandle = window.SdlWindowHandle;
-
-            SDL_SysWMinfo sysWmInfo;
-            Sdl2Native.SDL_GetVersion(&sysWmInfo.version);
-            Sdl2Native.SDL_GetWMWindowInfo(sdlHandle, &sysWmInfo);
-
-            SetSDLGLContextAttributes(options, backend);
-
-            IntPtr contextHandle = Sdl2Native.SDL_GL_CreateContext(sdlHandle);
-            byte* error = Sdl2Native.SDL_GetError();
-            if (error != null)
-            {
-                string errorString = GetString(error);
-                if (!string.IsNullOrEmpty(errorString))
-                {
-                    throw new VeldridException(
-                        $"Unable to create OpenGL Context: \"{errorString}\". This may indicate that the system does not support the requested OpenGL profile, version, or Swapchain format.");
-                }
-            }
-
-            int actualDepthSize;
-            int result = Sdl2Native.SDL_GL_GetAttribute(SDL_GLAttribute.DepthSize, &actualDepthSize);
-            int actualStencilSize;
-            result = Sdl2Native.SDL_GL_GetAttribute(SDL_GLAttribute.StencilSize, &actualStencilSize);
-
-            result = Sdl2Native.SDL_GL_SetSwapInterval(options.SyncToVerticalBlank ? 1 : 0);
-
-            OpenGL.OpenGLPlatformInfo platformInfo = new OpenGL.OpenGLPlatformInfo(
-                contextHandle,
-                Sdl2Native.SDL_GL_GetProcAddress,
-                context => Sdl2Native.SDL_GL_MakeCurrent(sdlHandle, context),
-                () => Sdl2Native.SDL_GL_GetCurrentContext(),
-                () => Sdl2Native.SDL_GL_MakeCurrent(new SDL_Window(IntPtr.Zero), IntPtr.Zero),
-                Sdl2Native.SDL_GL_DeleteContext,
-                () => Sdl2Native.SDL_GL_SwapWindow(sdlHandle),
-                sync => Sdl2Native.SDL_GL_SetSwapInterval(sync ? 1 : 0));
-
-            return GraphicsDevice.CreateOpenGL(
-                options,
-                platformInfo,
-                (uint)window.Width,
-                (uint)window.Height);
-        }
-
-        public static unsafe void SetSDLGLContextAttributes(GraphicsDeviceOptions options, GraphicsBackend backend)
-        {
-            if (backend != GraphicsBackend.OpenGL && backend != GraphicsBackend.OpenGLES)
-            {
-                throw new VeldridException(
-                    $"{nameof(backend)} must be {nameof(GraphicsBackend.OpenGL)} or {nameof(GraphicsBackend.OpenGLES)}.");
-            }
-
-            SDL_GLContextFlag contextFlags = options.Debug
-                ? SDL_GLContextFlag.Debug | SDL_GLContextFlag.ForwardCompatible
-                : SDL_GLContextFlag.ForwardCompatible;
-
-            Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextFlags, (int)contextFlags);
-
-            (int major, int minor) = GetMaxGLVersion(backend == GraphicsBackend.OpenGLES);
-
-            if (backend == GraphicsBackend.OpenGL)
-            {
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextProfileMask, (int)SDL_GLProfile.Core);
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMajorVersion, major);
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMinorVersion, minor);
-            }
-            else
-            {
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextProfileMask, (int)SDL_GLProfile.ES);
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMajorVersion, major);
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.ContextMinorVersion, minor);
-            }
-
-            int depthBits = 0;
-            int stencilBits = 0;
-            if (options.SwapchainDepthFormat.HasValue)
-            {
-                switch (options.SwapchainDepthFormat)
-                {
-                    case PixelFormat.R16_UNorm:
-                        depthBits = 16;
-                        break;
-                    case PixelFormat.D24_UNorm_S8_UInt:
-                        depthBits = 24;
-                        stencilBits = 8;
-                        break;
-                    case PixelFormat.R32_Float:
-                        depthBits = 32;
-                        break;
-                    case PixelFormat.D32_Float_S8_UInt:
-                        depthBits = 32;
-                        stencilBits = 8;
-                        break;
-                    default:
-                        throw new VeldridException("Invalid depth format: " + options.SwapchainDepthFormat.Value);
-                }
-            }
-
-            int result = Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.DepthSize, depthBits);
-            result = Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.StencilSize, stencilBits);
-
-            if (options.SwapchainSrgbFormat)
-            {
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.FramebufferSrgbCapable, 1);
-            }
-            else
-            {
-                Sdl2Native.SDL_GL_SetAttribute(SDL_GLAttribute.FramebufferSrgbCapable, 0);
             }
         }
 #endif

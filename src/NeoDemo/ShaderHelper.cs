@@ -36,8 +36,7 @@ namespace Veldrid.NeoDemo
         {
             SpecializationConstant[] specializations = GetSpecializations(gd);
 
-            bool fixClipZ = (gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES)
-                && !gd.IsDepthRangeZeroToOne;
+            bool fixClipZ = !gd.IsDepthRangeZeroToOne;
             bool invertY = false;
 
             return new CrossCompileOptions(fixClipZ, invertY, specializations);
@@ -45,7 +44,7 @@ namespace Veldrid.NeoDemo
 
         public static SpecializationConstant[] GetSpecializations(GraphicsDevice gd)
         {
-            bool glOrGles = gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES;
+            bool glOrGles = false;
 
             List<SpecializationConstant> specializations = new List<SpecializationConstant>();
             specializations.Add(new SpecializationConstant(100, gd.IsClipSpaceYInverted));
@@ -86,8 +85,6 @@ namespace Veldrid.NeoDemo
             {
                 case GraphicsBackend.Direct3D11: return ".hlsl.bytes";
                 case GraphicsBackend.Vulkan: return ".spv";
-                case GraphicsBackend.OpenGL:
-                    throw new InvalidOperationException("OpenGL and OpenGLES do not support shader bytecode.");
                 default: throw new InvalidOperationException("Invalid Graphics backend: " + backend);
             }
         }
@@ -98,10 +95,6 @@ namespace Veldrid.NeoDemo
             {
                 case GraphicsBackend.Direct3D11: return ".hlsl";
                 case GraphicsBackend.Vulkan: return ".450.glsl";
-                case GraphicsBackend.OpenGL:
-                    return ".330.glsl";
-                case GraphicsBackend.OpenGLES:
-                    return ".300.glsles";
                 default: throw new InvalidOperationException("Invalid Graphics backend: " + backend);
             }
         }

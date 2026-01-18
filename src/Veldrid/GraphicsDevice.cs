@@ -908,31 +908,6 @@ namespace Veldrid
         }
 #endif
 
-#if !EXCLUDE_OPENGL_BACKEND
-        /// <summary>
-        /// Tries to get a <see cref="BackendInfoOpenGL"/> for this instance. This method will only succeed if this is an OpenGL
-        /// GraphicsDevice.
-        /// </summary>
-        /// <param name="info">If successful, this will contain the <see cref="BackendInfoOpenGL"/> for this instance.</param>
-        /// <returns>True if this is an OpenGL GraphicsDevice and the operation was successful. False otherwise.</returns>
-        public virtual bool GetOpenGLInfo(out BackendInfoOpenGL info) { info = null; return false; }
-
-        /// <summary>
-        /// Gets a <see cref="BackendInfoOpenGL"/> for this instance. This method will only succeed if this is an OpenGL
-        /// GraphicsDevice. Otherwise, this method will throw an exception.
-        /// </summary>
-        /// <returns>The <see cref="BackendInfoOpenGL"/> for this instance.</returns>
-        public BackendInfoOpenGL GetOpenGLInfo()
-        {
-            if (!GetOpenGLInfo(out BackendInfoOpenGL info))
-            {
-                throw new VeldridException($"{nameof(GetOpenGLInfo)} can only be used on an OpenGL GraphicsDevice.");
-            }
-
-            return info;
-        }
-#endif
-
         /// <summary>
         /// Checks whether the given <see cref="GraphicsBackend"/> is supported on this system.
         /// </summary>
@@ -951,18 +926,6 @@ namespace Veldrid
                 case GraphicsBackend.Vulkan:
 #if !EXCLUDE_VULKAN_BACKEND
                     return Vk.VkGraphicsDevice.IsSupported();
-#else
-                    return false;
-#endif
-                case GraphicsBackend.OpenGL:
-#if !EXCLUDE_OPENGL_BACKEND
-                    return true;
-#else
-                    return false;
-#endif
-                case GraphicsBackend.OpenGLES:
-#if !EXCLUDE_OPENGL_BACKEND
-                    return !RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #else
                     return false;
 #endif
@@ -1132,41 +1095,6 @@ namespace Veldrid
                 options.SwapchainSrgbFormat);
 
             return new Vk.VkGraphicsDevice(options, scDesc);
-        }
-#endif
-
-#if !EXCLUDE_OPENGL_BACKEND
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using OpenGL or OpenGL ES, with a main Swapchain.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="platformInfo">An <see cref="OpenGL.OpenGLPlatformInfo"/> object encapsulating necessary OpenGL context
-        /// information.</param>
-        /// <param name="width">The initial width of the window.</param>
-        /// <param name="height">The initial height of the window.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the OpenGL or OpenGL ES API.</returns>
-        public static GraphicsDevice CreateOpenGL(
-            GraphicsDeviceOptions options,
-            OpenGL.OpenGLPlatformInfo platformInfo,
-            uint width,
-            uint height)
-        {
-            return new OpenGL.OpenGLGraphicsDevice(options, platformInfo, width, height);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GraphicsDevice"/> using OpenGL ES, with a main Swapchain.
-        /// This overload can only be used on iOS or Android to create a GraphicsDevice for an Android Surface or an iOS UIView.
-        /// </summary>
-        /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
-        /// <param name="swapchainDescription">A description of the main Swapchain to create.
-        /// The SwapchainSource must have been created from an Android Surface or an iOS UIView.</param>
-        /// <returns>A new <see cref="GraphicsDevice"/> using the OpenGL or OpenGL ES API.</returns>
-        public static GraphicsDevice CreateOpenGLES(
-            GraphicsDeviceOptions options,
-            SwapchainDescription swapchainDescription)
-        {
-            return new OpenGL.OpenGLGraphicsDevice(options, swapchainDescription);
         }
 #endif
     }
