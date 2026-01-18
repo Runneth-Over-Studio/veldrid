@@ -96,11 +96,7 @@ namespace Veldrid.StartupUtilities
             switch (preferredBackend)
             {
                 case GraphicsBackend.Vulkan:
-#if !EXCLUDE_VULKAN_BACKEND
                     return CreateVulkanGraphicsDevice(options, window);
-#else
-                    throw new VeldridException("Vulkan support has not been included in this configuration of Veldrid");
-#endif
                 default:
                     throw new VeldridException("Invalid GraphicsBackend: " + preferredBackend);
             }
@@ -139,7 +135,6 @@ namespace Veldrid.StartupUtilities
             return GraphicsBackend.Vulkan;
         }
 
-#if !EXCLUDE_VULKAN_BACKEND
         public static unsafe GraphicsDevice CreateVulkanGraphicsDevice(GraphicsDeviceOptions options, Sdl2Window window)
             => CreateVulkanGraphicsDevice(options, window, false);
         public static unsafe GraphicsDevice CreateVulkanGraphicsDevice(
@@ -175,7 +170,6 @@ namespace Veldrid.StartupUtilities
                     throw new PlatformNotSupportedException("Cannot create a Vulkan surface for " + sysWmInfo.subsystem + ".");
             }
         }
-#endif
 
         private static unsafe string GetString(byte* stringStart)
         {

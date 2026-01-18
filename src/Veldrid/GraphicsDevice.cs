@@ -858,7 +858,6 @@ namespace Veldrid
             PlatformDispose();
         }
 
-#if !EXCLUDE_VULKAN_BACKEND
         /// <summary>
         /// Tries to get a <see cref="BackendInfoVulkan"/> for this instance. This method will only succeed if this is a Vulkan
         /// GraphicsDevice.
@@ -881,7 +880,6 @@ namespace Veldrid
 
             return info;
         }
-#endif
 
         /// <summary>
         /// Checks whether the given <see cref="GraphicsBackend"/> is supported on this system.
@@ -893,17 +891,12 @@ namespace Veldrid
             switch (backend)
             {
                 case GraphicsBackend.Vulkan:
-#if !EXCLUDE_VULKAN_BACKEND
                     return Vk.VkGraphicsDevice.IsSupported();
-#else
-                    return false;
-#endif
                 default:
                     throw Illegal.Value<GraphicsBackend>();
             }
         }
 
-#if !EXCLUDE_VULKAN_BACKEND
         /// <summary>
         /// Creates a new <see cref="GraphicsDevice"/> using Vulkan.
         /// </summary>
@@ -970,6 +963,5 @@ namespace Veldrid
 
             return new Vk.VkGraphicsDevice(options, scDesc);
         }
-#endif
     }
 }

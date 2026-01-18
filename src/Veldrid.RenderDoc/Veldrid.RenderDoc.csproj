@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <Description>RenderDoc integration for Veldrid. Provides access to RenderDoc's in-application API. Can be used to configure, collect, and save RenderDoc capture files, and to launch and manage the RenderDoc replay UI application.</Description>
-    <PackageTags>Debug Profile 3D Graphics Direct3D DirectX Vulkan OpenGL Core Standard Game</PackageTags>
+    <PackageTags>Debug Profile 3D Graphics Vulkan Game</PackageTags>
   </PropertyGroup>
 
 </Project>
