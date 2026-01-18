@@ -186,6 +186,8 @@ namespace Veldrid.StartupUtilities
 
         public static GraphicsBackend GetPlatformDefaultBackend()
         {
+            return GraphicsBackend.Vulkan;
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return GraphicsBackend.Direct3D11;
