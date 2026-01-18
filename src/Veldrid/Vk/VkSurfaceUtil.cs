@@ -1,11 +1,9 @@
-﻿using Vulkan;
-using Vulkan.Xlib;
+﻿using Veldrid.MetalBindings;
+using Vulkan;
 using Vulkan.Wayland;
-using static Vulkan.VulkanNative;
+using Vulkan.Xlib;
 using static Veldrid.Vk.VulkanUtil;
-using Veldrid.Android;
-using System;
-using Veldrid.MetalBindings;
+using static Vulkan.VulkanNative;
 
 namespace Veldrid.Vk
 {
@@ -40,12 +38,6 @@ namespace Veldrid.Vk
                         throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_WIN32_SURFACE_EXTENSION_NAME}");
                     }
                     return CreateWin32(instance, win32Source);
-                case AndroidSurfaceSwapchainSource androidSource:
-                    if (doCheck && !gd.HasSurfaceExtension(CommonStrings.VK_KHR_ANDROID_SURFACE_EXTENSION_NAME))
-                    {
-                        throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_ANDROID_SURFACE_EXTENSION_NAME}");
-                    }
-                    return CreateAndroidSurface(instance, androidSource);
                 case NSWindowSwapchainSource nsWindowSource:
                     if (doCheck)
                     {
@@ -125,17 +117,6 @@ namespace Veldrid.Vk
             wsci.display = (wl_display*)waylandSource.Display;
             wsci.surface = (wl_surface*)waylandSource.Surface;
             VkResult result = vkCreateWaylandSurfaceKHR(instance, ref wsci, null, out VkSurfaceKHR surface);
-            CheckResult(result);
-            return surface;
-        }
-
-        private static VkSurfaceKHR CreateAndroidSurface(VkInstance instance, AndroidSurfaceSwapchainSource androidSource)
-        {
-            IntPtr aNativeWindow = AndroidRuntime.ANativeWindow_fromSurface(androidSource.JniEnv, androidSource.Surface);
-
-            VkAndroidSurfaceCreateInfoKHR androidSurfaceCI = VkAndroidSurfaceCreateInfoKHR.New();
-            androidSurfaceCI.window = (Vulkan.Android.ANativeWindow*)aNativeWindow;
-            VkResult result = vkCreateAndroidSurfaceKHR(instance, ref androidSurfaceCI, null, out VkSurfaceKHR surface);
             CheckResult(result);
             return surface;
         }

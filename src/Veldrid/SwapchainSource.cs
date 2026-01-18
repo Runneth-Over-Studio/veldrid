@@ -70,16 +70,6 @@ namespace Veldrid
         public static SwapchainSource CreateUIView(IntPtr uiView) => new UIViewSwapchainSource(uiView);
 
         /// <summary>
-        /// Creates a new SwapchainSource for the given Android Surface.
-        /// </summary>
-        /// <param name="surfaceHandle">The handle of the Android Surface.</param>
-        /// <param name="jniEnv">The Java Native Interface Environment handle.</param>
-        /// <returns>A new SwapchainSource which can be used to create a Vulkan <see cref="Swapchain"/> or an OpenGLES
-        /// <see cref="GraphicsDevice"/> for the given Android Surface.</returns>
-        public static SwapchainSource CreateAndroidSurface(IntPtr surfaceHandle, IntPtr jniEnv)
-            => new AndroidSurfaceSwapchainSource(surfaceHandle, jniEnv);
-
-        /// <summary>
         /// Creates a new SwapchainSource for the given NSView.
         /// </summary>
         /// <param name="nsView">A pointer to an NSView.</param>
@@ -154,18 +144,6 @@ namespace Veldrid
         public UIViewSwapchainSource(IntPtr uiView)
         {
             UIView = uiView;
-        }
-    }
-
-    internal class AndroidSurfaceSwapchainSource : SwapchainSource
-    {
-        public IntPtr Surface { get; }
-        public IntPtr JniEnv { get; }
-
-        public AndroidSurfaceSwapchainSource(IntPtr surfaceHandle, IntPtr jniEnv)
-        {
-            Surface = surfaceHandle;
-            JniEnv = jniEnv;
         }
     }
 
