@@ -1,7 +1,7 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
+using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -42,12 +42,12 @@ namespace Veldrid.ImageSharp
         /// </summary>
         public uint MipLevels => (uint)Images.Length;
 
-        public ImageSharpTexture(string path) : this(Image.Load<Rgba32>(path), true) { }
-        public ImageSharpTexture(string path, bool mipmap) : this(Image.Load<Rgba32>(path), mipmap) { }
-        public ImageSharpTexture(string path, bool mipmap, bool srgb) : this(Image.Load<Rgba32>(path), mipmap, srgb) { }
-        public ImageSharpTexture(Stream stream) : this(Image.Load<Rgba32>(stream), true) { }
-        public ImageSharpTexture(Stream stream, bool mipmap) : this(Image.Load<Rgba32>(stream), mipmap) { }
-        public ImageSharpTexture(Stream stream, bool mipmap, bool srgb) : this(Image.Load<Rgba32>(stream), mipmap, srgb) { }
+        public ImageSharpTexture(string path) : this(CreateDefaultImage(path), true) { }
+        public ImageSharpTexture(string path, bool mipmap) : this(CreateDefaultImage(path), mipmap) { }
+        public ImageSharpTexture(string path, bool mipmap, bool srgb) : this(CreateDefaultImage(path), mipmap, srgb) { }
+        public ImageSharpTexture(Stream stream) : this(CreateDefaultImage(stream), true) { }
+        public ImageSharpTexture(Stream stream, bool mipmap) : this(CreateDefaultImage(stream), mipmap) { }
+        public ImageSharpTexture(Stream stream, bool mipmap, bool srgb) : this(CreateDefaultImage(stream), mipmap, srgb) { }
         public ImageSharpTexture(Image<Rgba32> image, bool mipmap = true) : this(image, mipmap, false) { }
         public ImageSharpTexture(Image<Rgba32> image, bool mipmap, bool srgb)
         {
@@ -69,85 +69,141 @@ namespace Veldrid.ImageSharp
 
         private unsafe Texture CreateTextureViaStaging(GraphicsDevice gd, ResourceFactory factory)
         {
-            Texture staging = factory.CreateTexture(
-                TextureDescription.Texture2D(Width, Height, MipLevels, 1, Format, TextureUsage.Staging));
+            Texture staging = factory.CreateTexture(TextureDescription.Texture2D(Width, Height, MipLevels, 1, Format, TextureUsage.Staging));
 
-            Texture ret = factory.CreateTexture(
-                TextureDescription.Texture2D(Width, Height, MipLevels, 1, Format, TextureUsage.Sampled));
+            Texture ret = factory.CreateTexture(TextureDescription.Texture2D(Width, Height, MipLevels, 1, Format, TextureUsage.Sampled));
 
             CommandList cl = gd.ResourceFactory.CreateCommandList();
             cl.Begin();
+
             for (uint level = 0; level < MipLevels; level++)
             {
-                Image<Rgba32> image = Images[level];
-                if (!image.TryGetSinglePixelSpan(out Span<Rgba32> pixelSpan))
+                Image<Rgba32> image = Images[(int)level];
+
+                int w = image.Width;
+                int h = image.Height;
+
+                uint rowWidth = (uint)(w * 4);           // RGBA32
+                uint totalBytes = (uint)(w * h * 4);
+
+                // Try fast path: contiguous pixel memory
+                if (image.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> mem))
                 {
-                    throw new VeldridException("Unable to get image pixelspan.");
+                    fixed (Rgba32* pin = &MemoryMarshal.GetReference(mem.Span))
+                    {
+                        WriteToStagingAndCopy(gd, staging, ret, cl, level, (uint)w, (uint)h, pin, rowWidth, totalBytes);
+                    }
                 }
-                fixed (void* pin = &MemoryMarshal.GetReference(pixelSpan))
+                else
                 {
-                    MappedResource map = gd.Map(staging, MapMode.Write, level);
-                    uint rowWidth = (uint)(image.Width * 4);
-                    if (rowWidth == map.RowPitch)
+                    Rgba32[] tmp = ArrayPool<Rgba32>.Shared.Rent(w * h);
+
+                    image.ProcessPixelRows(accessor =>
                     {
-                        Unsafe.CopyBlock(map.Data.ToPointer(), pin, (uint)(image.Width * image.Height * 4));
-                    }
-                    else
-                    {
-                        for (uint y = 0; y < image.Height; y++)
+                        for (int y = 0; y < h; y++)
                         {
-                            byte* dstStart = (byte*)map.Data.ToPointer() + y * map.RowPitch;
-                            byte* srcStart = (byte*)pin + y * rowWidth;
-                            Unsafe.CopyBlock(dstStart, srcStart, rowWidth);
+                            accessor.GetRowSpan(y).CopyTo(tmp.AsSpan(y * w, w));
                         }
+                    });
+
+                    fixed (Rgba32* pin = &tmp[0])
+                    {
+                        WriteToStagingAndCopy(gd, staging, ret, cl, level, (uint)w, (uint)h, pin, rowWidth, totalBytes);
                     }
-                    gd.Unmap(staging, level);
-
-                    cl.CopyTexture(
-                        staging, 0, 0, 0, level, 0,
-                        ret, 0, 0, 0, level, 0,
-                        (uint)image.Width, (uint)image.Height, 1, 1);
-
                 }
             }
-            cl.End();
 
+            cl.End();
             gd.SubmitCommands(cl);
+
             staging.Dispose();
             cl.Dispose();
 
             return ret;
         }
 
+        private static unsafe void WriteToStagingAndCopy(GraphicsDevice gd, Texture staging, Texture ret, CommandList cl, uint level, uint width, uint height, Rgba32* srcPin, uint rowWidth, uint totalBytes)
+        {
+            MappedResource map = gd.Map(staging, MapMode.Write, level);
+
+            if (rowWidth == map.RowPitch)
+            {
+                Unsafe.CopyBlock(map.Data.ToPointer(), srcPin, totalBytes);
+            }
+            else
+            {
+                for (uint y = 0; y < height; y++)
+                {
+                    byte* dstStart = (byte*)map.Data.ToPointer() + y * map.RowPitch;
+                    byte* srcStart = (byte*)srcPin + y * rowWidth;
+                    Unsafe.CopyBlock(dstStart, srcStart, rowWidth);
+                }
+            }
+
+            gd.Unmap(staging, level);
+
+            cl.CopyTexture(
+                staging, 0, 0, 0, level, 0,
+                ret, 0, 0, 0, level, 0,
+                width, height, 1, 1);
+        }
+
         private unsafe Texture CreateTextureViaUpdate(GraphicsDevice gd, ResourceFactory factory)
         {
-            Texture tex = factory.CreateTexture(TextureDescription.Texture2D(
-                Width, Height, MipLevels, 1, Format, TextureUsage.Sampled));
+            Texture tex = factory.CreateTexture(TextureDescription.Texture2D(Width, Height, MipLevels, 1, Format, TextureUsage.Sampled));
+
             for (int level = 0; level < MipLevels; level++)
             {
                 Image<Rgba32> image = Images[level];
-                if (!image.TryGetSinglePixelSpan(out Span<Rgba32> pixelSpan))
+
+                int w = image.Width;
+                int h = image.Height;
+                uint sizeInBytes = (uint)(PixelSizeInBytes * w * h);
+
+                if (image.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> mem))
                 {
-                    throw new VeldridException("Unable to get image pixelspan.");
+                    fixed (Rgba32* pin = &MemoryMarshal.GetReference(mem.Span))
+                    {
+                        gd.UpdateTexture(tex, (IntPtr)pin, sizeInBytes, 0, 0, 0, (uint)w, (uint)h, 1, (uint)level, 0);
+                    }
                 }
-                fixed (void* pin = &MemoryMarshal.GetReference(pixelSpan))
+                else
                 {
-                    gd.UpdateTexture(
-                        tex,
-                        (IntPtr)pin,
-                        (uint)(PixelSizeInBytes * image.Width * image.Height),
-                        0,
-                        0,
-                        0,
-                        (uint)image.Width,
-                        (uint)image.Height,
-                        1,
-                        (uint)level,
-                        0);
+                    Rgba32[] tmp = ArrayPool<Rgba32>.Shared.Rent(w * h);
+
+                    image.ProcessPixelRows(accessor =>
+                    {
+                        for (int y = 0; y < h; y++)
+                        {
+                            Span<Rgba32> row = accessor.GetRowSpan(y);
+                            row.CopyTo(tmp.AsSpan(y * w, w));
+                        }
+                    });
+
+                    fixed (Rgba32* pin = &tmp[0])
+                    {
+                        gd.UpdateTexture(tex, (IntPtr)pin, sizeInBytes, 0, 0, 0, (uint)w, (uint)h, 1, (uint)level, 0);
+                    }
                 }
             }
 
             return tex;
+        }
+
+        private static Image<Rgba32> CreateDefaultImage(string path)
+        {
+            Configuration config = Configuration.Default.Clone();
+            config.PreferContiguousImageBuffers = true;
+
+            return Image.Load<Rgba32>(config, path);
+        }
+
+        private static Image<Rgba32> CreateDefaultImage(Stream stream)
+        {
+            Configuration config = Configuration.Default.Clone();
+            config.PreferContiguousImageBuffers = true;
+
+            return Image.Load<Rgba32>(config, stream);
         }
     }
 }
