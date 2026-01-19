@@ -252,15 +252,6 @@ namespace Veldrid.NeoDemo
             {
                 if (ImGui.BeginMenu("Settings"))
                 {
-                    if (ImGui.BeginMenu("Graphics Backend"))
-                    {
-
-                        if (ImGui.MenuItem("Vulkan", string.Empty, _gd.BackendType == GraphicsBackend.Vulkan, GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)))
-                        {
-                            ChangeBackend(GraphicsBackend.Vulkan);
-                        }
-                        ImGui.EndMenu();
-                    }
                     if (ImGui.BeginMenu("MSAA"))
                     {
                         if (ImGui.Combo("MSAA", ref _msaaOption, _msaaOptions, _msaaOptions.Length))
