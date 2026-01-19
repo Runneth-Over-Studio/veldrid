@@ -13,6 +13,10 @@
     <PackageReference Include="Vk" Version="1.0.25" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.9.50" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Description>A low-level, hardware-accelerated graphics and compute library for .NET, with a Vulkan backend. Veldrid can be used to create high-performance 2D and 3D games, simulations, tools, and other graphical applications.</Description>
     <PackageTags>3D Graphics Vulkan Game</PackageTags>

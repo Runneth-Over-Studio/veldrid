@@ -63,6 +63,10 @@
     <ProjectReference Include="..\Veldrid.SDL2\Veldrid.SDL2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.9.50" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Description>ImGui integration for Veldrid. Provides a simple interface for rendering and interacting with ImGui.NET.</Description>
     <PackageTags>3D Graphics Vulkan Game ImGui</PackageTags>
