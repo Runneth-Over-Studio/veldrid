@@ -91,7 +91,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
 
         public override GraphicsDeviceFeatures Features { get; }
 
-        public override bool GetVulkanInfo(out BackendInfoVulkan info)
+        public bool GetVulkanInfo(out BackendInfoVulkan info)
         {
             info = _vulkanInfo;
             return true;

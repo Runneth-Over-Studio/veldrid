@@ -860,29 +860,6 @@ public abstract class GraphicsDevice : IDisposable
     }
 
     /// <summary>
-    /// Tries to get a <see cref="BackendInfoVulkan"/> for this instance. This method will only succeed if this is a Vulkan
-    /// GraphicsDevice.
-    /// </summary>
-    /// <param name="info">If successful, this will contain the <see cref="BackendInfoVulkan"/> for this instance.</param>
-    /// <returns>True if this is a Vulkan GraphicsDevice and the operation was successful. False otherwise.</returns>
-    public virtual bool GetVulkanInfo(out BackendInfoVulkan info) { info = null; return false; }
-
-    /// <summary>
-    /// Gets a <see cref="BackendInfoVulkan"/> for this instance. This method will only succeed if this is a Vulkan
-    /// GraphicsDevice. Otherwise, this method will throw an exception.
-    /// </summary>
-    /// <returns>The <see cref="BackendInfoVulkan"/> for this instance.</returns>
-    public BackendInfoVulkan GetVulkanInfo()
-    {
-        if (!GetVulkanInfo(out BackendInfoVulkan info))
-        {
-            throw new Exception($"{nameof(GetVulkanInfo)} can only be used on a Vulkan GraphicsDevice.");
-        }
-
-        return info;
-    }
-
-    /// <summary>
     /// Checks whether the given <see cref="GraphicsBackend"/> is supported on this system.
     /// </summary>
     /// <param name="backend">The GraphicsBackend to check.</param>
