@@ -5,7 +5,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkResourceSet : ResourceSet
+    internal unsafe sealed class VkResourceSet : ResourceSet
     {
         private readonly VkGraphicsDevice _gd;
         private readonly DescriptorResourceCounts _descriptorCounts;

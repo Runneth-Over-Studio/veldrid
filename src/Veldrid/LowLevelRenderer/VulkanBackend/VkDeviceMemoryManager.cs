@@ -7,7 +7,7 @@ using System;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkDeviceMemoryManager : IDisposable
+    internal unsafe sealed class VkDeviceMemoryManager : IDisposable
     {
         private const ulong MinDedicatedAllocationSizeDynamic = 1024 * 1024 * 64;
         private const ulong MinDedicatedAllocationSizeNonDynamic = 1024 * 1024 * 256;

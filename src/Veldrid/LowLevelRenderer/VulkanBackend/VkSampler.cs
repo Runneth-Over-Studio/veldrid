@@ -5,7 +5,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkSampler : Sampler
+    internal unsafe sealed class VkSampler : Sampler
     {
         private readonly VkGraphicsDevice _gd;
         private readonly Vulkan.VkSampler _sampler;

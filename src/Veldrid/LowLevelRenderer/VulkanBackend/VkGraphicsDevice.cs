@@ -13,7 +13,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkGraphicsDevice : GraphicsDevice
+    internal unsafe sealed class VkGraphicsDevice : GraphicsDevice
     {
         private const uint VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR = 0x00000001;
         private static readonly FixedUtf8String s_name = "Veldrid-VkGraphicsDevice";

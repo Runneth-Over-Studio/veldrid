@@ -5,7 +5,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkTextureView : TextureView
+    internal unsafe sealed class VkTextureView : TextureView
     {
         private readonly VkGraphicsDevice _gd;
         private readonly VkImageView _imageView;

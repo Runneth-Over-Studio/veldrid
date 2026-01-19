@@ -8,7 +8,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkPipeline : Pipeline
+    internal unsafe sealed class VkPipeline : Pipeline
     {
         private readonly VkGraphicsDevice _gd;
         private readonly Vulkan.VkPipeline _devicePipeline;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class FixedUtf8String : IDisposable
+    internal unsafe sealed class FixedUtf8String : IDisposable
     {
         private GCHandle _handle;
         private uint _numBytes;

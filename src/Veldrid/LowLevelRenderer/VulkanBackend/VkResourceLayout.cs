@@ -6,7 +6,7 @@ using Veldrid.Vk;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkResourceLayout : ResourceLayout
+    internal unsafe sealed class VkResourceLayout : ResourceLayout
     {
         private readonly VkGraphicsDevice _gd;
         private readonly VkDescriptorSetLayout _dsl;

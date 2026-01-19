@@ -4,7 +4,7 @@ using Vulkan;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal class VkResourceFactory : ResourceFactory
+    internal sealed class VkResourceFactory : ResourceFactory
     {
         private readonly VkGraphicsDevice _gd;
         private readonly VkDevice _device;

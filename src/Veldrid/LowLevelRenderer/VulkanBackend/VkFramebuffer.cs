@@ -7,7 +7,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkFramebuffer : VkFramebufferBase
+    internal unsafe sealed class VkFramebuffer : VkFramebufferBase
     {
         private readonly VkGraphicsDevice _gd;
         private readonly Vulkan.VkFramebuffer _deviceFramebuffer;

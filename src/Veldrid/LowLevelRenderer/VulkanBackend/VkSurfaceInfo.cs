@@ -37,7 +37,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
         internal abstract SwapchainSource GetSurfaceSource();
     }
 
-    internal class Win32VkSurfaceInfo : VkSurfaceSource
+    internal sealed class Win32VkSurfaceInfo : VkSurfaceSource
     {
         private readonly IntPtr _hinstance;
         private readonly IntPtr _hwnd;
@@ -59,7 +59,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
         }
     }
 
-    internal class XlibVkSurfaceInfo : VkSurfaceSource
+    internal sealed class XlibVkSurfaceInfo : VkSurfaceSource
     {
         private readonly unsafe Display* _display;
         private readonly Window _window;

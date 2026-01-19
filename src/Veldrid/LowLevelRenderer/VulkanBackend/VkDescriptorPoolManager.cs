@@ -5,7 +5,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal class VkDescriptorPoolManager
+    internal sealed class VkDescriptorPoolManager
     {
         private readonly VkGraphicsDevice _gd;
         private readonly List<PoolInfo> _pools = new List<PoolInfo>();

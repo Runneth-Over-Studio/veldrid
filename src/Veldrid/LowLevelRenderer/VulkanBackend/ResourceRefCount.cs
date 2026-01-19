@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal class ResourceRefCount
+    internal sealed class ResourceRefCount
     {
         private readonly Action _disposeAction;
         private int _refCount;

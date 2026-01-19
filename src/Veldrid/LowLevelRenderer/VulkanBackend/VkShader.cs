@@ -6,7 +6,7 @@ using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkShader : Shader
+    internal unsafe sealed class VkShader : Shader
     {
         private readonly VkGraphicsDevice _gd;
         private readonly VkShaderModule _shaderModule;

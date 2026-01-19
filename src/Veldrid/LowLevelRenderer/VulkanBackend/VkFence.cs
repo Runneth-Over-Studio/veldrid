@@ -4,7 +4,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkFence : Fence
+    internal unsafe sealed class VkFence : Fence
     {
         private readonly VkGraphicsDevice _gd;
         private Vulkan.VkFence _fence;

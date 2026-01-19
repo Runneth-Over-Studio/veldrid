@@ -7,7 +7,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkSwapchain : Swapchain
+    internal unsafe sealed class VkSwapchain : Swapchain
     {
         private readonly VkGraphicsDevice _gd;
         private readonly VkSurfaceKHR _surface;

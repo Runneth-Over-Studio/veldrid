@@ -11,7 +11,7 @@ using static Vulkan.VulkanNative;
 
 namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
-    internal unsafe class VkCommandList : CommandList
+    internal unsafe sealed class VkCommandList : CommandList
     {
         private readonly VkGraphicsDevice _gd;
         private VkCommandPool _pool;
