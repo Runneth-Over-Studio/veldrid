@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Veldrid.LowLevelRenderer.Core;
 using Veldrid.Vk;
 using Vulkan;
@@ -327,7 +328,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
                 {
                     if (_imageLayouts[CalculateSubresource(baseMipLevel + level, baseArrayLayer + layer)] != oldLayout)
                     {
-                        throw new VeldridException("Unexpected image layout.");
+                        throw new Exception("Unexpected image layout.");
                     }
                 }
             }

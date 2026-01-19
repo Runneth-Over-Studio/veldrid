@@ -86,7 +86,7 @@ public abstract class GraphicsDevice : IDisposable
         {
             if (MainSwapchain == null)
             {
-                throw new VeldridException($"This GraphicsDevice was created without a main Swapchain. This property cannot be set.");
+                throw new Exception($"This GraphicsDevice was created without a main Swapchain. This property cannot be set.");
             }
 
             MainSwapchain.SyncToVerticalBlank = value;
@@ -144,7 +144,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (!WaitForFence(fence, ulong.MaxValue))
         {
-            throw new VeldridException("The operation timed out before the Fence was signaled.");
+            throw new Exception("The operation timed out before the Fence was signaled.");
         }
     }
 
@@ -176,7 +176,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (!WaitForFences(fences, waitAll, ulong.MaxValue))
         {
-            throw new VeldridException("The operation timed out before the Fence(s) were signaled.");
+            throw new Exception("The operation timed out before the Fence(s) were signaled.");
         }
     }
 
@@ -218,7 +218,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (MainSwapchain == null)
         {
-            throw new VeldridException("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
+            throw new Exception("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
         }
 
         SwapBuffers(MainSwapchain);
@@ -251,7 +251,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (MainSwapchain == null)
         {
-            throw new VeldridException("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
+            throw new Exception("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
         }
 
         MainSwapchain.Resize(width, height);
@@ -301,15 +301,15 @@ public abstract class GraphicsDevice : IDisposable
             if ((buffer.Usage & BufferUsage.Dynamic) != BufferUsage.Dynamic
                 && (buffer.Usage & BufferUsage.Staging) != BufferUsage.Staging)
             {
-                throw new VeldridException("Buffers must have the Staging or Dynamic usage flag to be mapped.");
+                throw new Exception("Buffers must have the Staging or Dynamic usage flag to be mapped.");
             }
             if (subresource != 0)
             {
-                throw new VeldridException("Subresource must be 0 for Buffer resources.");
+                throw new Exception("Subresource must be 0 for Buffer resources.");
             }
             if ((mode == MapMode.Read || mode == MapMode.ReadWrite) && (buffer.Usage & BufferUsage.Staging) == 0)
             {
-                throw new VeldridException(
+                throw new Exception(
                     $"{nameof(MapMode)}.{nameof(MapMode.Read)} and {nameof(MapMode)}.{nameof(MapMode.ReadWrite)} can only be used on buffers created with {nameof(BufferUsage)}.{nameof(BufferUsage.Staging)}.");
             }
         }
@@ -317,11 +317,11 @@ public abstract class GraphicsDevice : IDisposable
         {
             if ((tex.Usage & TextureUsage.Staging) == 0)
             {
-                throw new VeldridException("Texture must have the Staging usage flag to be mapped.");
+                throw new Exception("Texture must have the Staging usage flag to be mapped.");
             }
             if (subresource >= tex.ArrayLayers * tex.MipLevels)
             {
-                throw new VeldridException(
+                throw new Exception(
                     "Subresource must be less than the number of subresources in the Texture being mapped.");
             }
         }
@@ -533,14 +533,14 @@ public abstract class GraphicsDevice : IDisposable
                 Util.GetMipDimensions(texture, mipLevel, out uint mipWidth, out uint mipHeight, out _);
                 if (width != mipWidth && height != mipHeight)
                 {
-                    throw new VeldridException($"Updates to block-compressed textures must use a region that is block-size aligned and sized.");
+                    throw new Exception($"Updates to block-compressed textures must use a region that is block-size aligned and sized.");
                 }
             }
         }
         uint expectedSize = FormatHelpers.GetRegionSize(width, height, depth, texture.Format);
         if (sizeInBytes < expectedSize)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"The data size is less than expected for the given update region. At least {expectedSize} bytes must be provided, but only {sizeInBytes} were.");
         }
 
@@ -560,12 +560,12 @@ public abstract class GraphicsDevice : IDisposable
 
         if (x + width > roundedTextureWidth || y + height > roundedTextureHeight || z + depth > texture.Depth)
         {
-            throw new VeldridException($"The given region does not fit into the Texture.");
+            throw new Exception($"The given region does not fit into the Texture.");
         }
 
         if (mipLevel >= texture.MipLevels)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"{nameof(mipLevel)} ({mipLevel}) must be less than the Texture's mip level count ({texture.MipLevels}).");
         }
 
@@ -576,7 +576,7 @@ public abstract class GraphicsDevice : IDisposable
         }
         if (arrayLayer >= effectiveArrayLayers)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"{nameof(arrayLayer)} ({arrayLayer}) must be less than the Texture's effective array layer count ({effectiveArrayLayers}).");
         }
     }
@@ -716,7 +716,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (bufferOffsetInBytes + sizeInBytes > buffer.SizeInBytes)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"The data size given to UpdateBuffer is too large. The given buffer can only hold {buffer.SizeInBytes} total bytes. The requested update would require {bufferOffsetInBytes + sizeInBytes} bytes.");
         }
         if (sizeInBytes == 0)
@@ -837,7 +837,7 @@ public abstract class GraphicsDevice : IDisposable
         {
             if (!Features.SamplerAnisotropy)
             {
-                throw new VeldridException(
+                throw new Exception(
                     "GraphicsDevice.Aniso4xSampler cannot be used unless GraphicsDeviceFeatures.SamplerAnisotropy is supported.");
             }
 
@@ -876,7 +876,7 @@ public abstract class GraphicsDevice : IDisposable
     {
         if (!GetVulkanInfo(out BackendInfoVulkan info))
         {
-            throw new VeldridException($"{nameof(GetVulkanInfo)} can only be used on a Vulkan GraphicsDevice.");
+            throw new Exception($"{nameof(GetVulkanInfo)} can only be used on a Vulkan GraphicsDevice.");
         }
 
         return info;

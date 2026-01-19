@@ -1,4 +1,5 @@
-﻿using Veldrid.LowLevelRenderer.Core;
+﻿using System;
+using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
 
 namespace Veldrid.Vk
@@ -145,7 +146,7 @@ namespace Veldrid.Vk
                     return VkFormat.B10g11r11UfloatPack32;
 
                 default:
-                    throw new VeldridException($"Invalid {nameof(PixelFormat)}: {format}");
+                    throw new Exception($"Invalid {nameof(PixelFormat)}: {format}");
             }
         }
     }

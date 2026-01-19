@@ -1,4 +1,5 @@
-﻿using Veldrid.LowLevelRenderer.Core;
+﻿using System;
+using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
 using Vulkan.Wayland;
 using Vulkan.Xlib;
@@ -16,30 +17,30 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
             var doCheck = gd != null;
 
             if (doCheck && !gd.HasSurfaceExtension(CommonStrings.VK_KHR_SURFACE_EXTENSION_NAME))
-                throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_SURFACE_EXTENSION_NAME}");
+                throw new Exception($"The required instance extension was not available: {CommonStrings.VK_KHR_SURFACE_EXTENSION_NAME}");
 
             switch (swapchainSource)
             {
                 case XlibSwapchainSource xlibSource:
                     if (doCheck && !gd.HasSurfaceExtension(CommonStrings.VK_KHR_XLIB_SURFACE_EXTENSION_NAME))
                     {
-                        throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_XLIB_SURFACE_EXTENSION_NAME}");
+                        throw new Exception($"The required instance extension was not available: {CommonStrings.VK_KHR_XLIB_SURFACE_EXTENSION_NAME}");
                     }
                     return CreateXlib(instance, xlibSource);
                 case WaylandSwapchainSource waylandSource:
                     if (doCheck && !gd.HasSurfaceExtension(CommonStrings.VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME))
                     {
-                        throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME}");
+                        throw new Exception($"The required instance extension was not available: {CommonStrings.VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME}");
                     }
                     return CreateWayland(instance, waylandSource);
                 case Win32SwapchainSource win32Source:
                     if (doCheck && !gd.HasSurfaceExtension(CommonStrings.VK_KHR_WIN32_SURFACE_EXTENSION_NAME))
                     {
-                        throw new VeldridException($"The required instance extension was not available: {CommonStrings.VK_KHR_WIN32_SURFACE_EXTENSION_NAME}");
+                        throw new Exception($"The required instance extension was not available: {CommonStrings.VK_KHR_WIN32_SURFACE_EXTENSION_NAME}");
                     }
                     return CreateWin32(instance, win32Source);
                 default:
-                    throw new VeldridException($"The provided SwapchainSource cannot be used to create a Vulkan surface.");
+                    throw new Exception($"The provided SwapchainSource cannot be used to create a Vulkan surface.");
             }
         }
 

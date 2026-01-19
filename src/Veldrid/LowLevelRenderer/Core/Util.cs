@@ -14,12 +14,12 @@ internal static class Util
 #if DEBUG
         if (value == null)
         {
-            throw new VeldridException($"Expected object of type {typeof(TDerived).FullName} but received null instead.");
+            throw new Exception($"Expected object of type {typeof(TDerived).FullName} but received null instead.");
         }
 
         if (!(value is TDerived derived))
         {
-            throw new VeldridException($"object {value} must be derived type {typeof(TDerived).FullName} to be used in this context.");
+            throw new Exception($"object {value} must be derived type {typeof(TDerived).FullName} to be used in this context.");
         }
 
         return derived;
@@ -301,7 +301,7 @@ internal static class Util
         }
         else
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"Unexpected resource type. Expected Texture or TextureView but found {resource.GetType().Name}");
         }
     }

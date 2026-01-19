@@ -16,7 +16,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
         {
             if (result != VkResult.Success)
             {
-                throw new VeldridException("Unsuccessful VkResult: " + result);
+                throw new Exception("Unsuccessful VkResult: " + result);
             }
         }
 

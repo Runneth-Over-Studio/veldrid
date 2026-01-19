@@ -549,7 +549,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
             {
                 if (!availableInstanceExtensions.Contains(requiredExt))
                 {
-                    throw new VeldridException($"The required instance extension was not available: {requiredExt}");
+                    throw new Exception($"The required instance extension was not available: {requiredExt}");
                 }
 
                 FixedUtf8String utf8Str = new FixedUtf8String(requiredExt);
@@ -663,7 +663,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
 
             if (debugReportFlags == VkDebugReportFlagsEXT.ErrorEXT)
             {
-                throw new VeldridException("A Vulkan validation error was encountered: " + fullMessage);
+                throw new Exception("A Vulkan validation error was encountered: " + fullMessage);
             }
 
             Console.WriteLine(fullMessage);
@@ -800,7 +800,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
             if (requiredInstanceExtensions.Count != 0)
             {
                 string missingList = string.Join(", ", requiredInstanceExtensions);
-                throw new VeldridException(
+                throw new Exception(
                     $"The following Vulkan device extensions were not available: {missingList}");
             }
 

@@ -141,7 +141,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
         {
             if (_commandBufferBegun)
             {
-                throw new VeldridException(
+                throw new Exception(
                     "CommandList must be in its initial state, or End() must have been called, for Begin() to be valid to call.");
             }
             if (_commandBufferEnded)
@@ -444,7 +444,7 @@ namespace Veldrid.LowLevelRenderer.VulkanBackend
         {
             if (!_commandBufferBegun)
             {
-                throw new VeldridException("CommandBuffer must have been started before End() may be called.");
+                throw new Exception("CommandBuffer must have been started before End() may be called.");
             }
 
             _commandBufferBegun = false;

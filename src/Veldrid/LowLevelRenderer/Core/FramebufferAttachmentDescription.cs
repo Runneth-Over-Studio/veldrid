@@ -57,12 +57,12 @@ public struct FramebufferAttachmentDescription : IEquatable<FramebufferAttachmen
 
         if (arrayLayer >= effectiveArrayLayers)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"{nameof(arrayLayer)} must be less than {nameof(target)}.{nameof(Texture.ArrayLayers)}.");
         }
         if (mipLevel >= target.MipLevels)
         {
-            throw new VeldridException(
+            throw new Exception(
                 $"{nameof(mipLevel)} must be less than {nameof(target)}.{nameof(Texture.MipLevels)}.");
         }
 #endif

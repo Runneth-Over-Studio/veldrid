@@ -205,7 +205,7 @@ namespace Veldrid.ImageSharp
         {
             if (!img.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> mem))
             {
-                throw new VeldridException($"Unable to get contiguous pixel memory for {what}.");
+                throw new Exception($"Unable to get contiguous pixel memory for {what}.");
             }
             return mem;
         }

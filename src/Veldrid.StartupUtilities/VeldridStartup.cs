@@ -80,7 +80,7 @@ namespace Veldrid.StartupUtilities
                 case WindowState.Hidden:
                     return SDL_WindowFlags.Hidden;
                 default:
-                    throw new VeldridException("Invalid WindowState: " + state);
+                    throw new Exception("Invalid WindowState: " + state);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Veldrid.StartupUtilities
                 case GraphicsBackend.Vulkan:
                     return CreateVulkanGraphicsDevice(options, window);
                 default:
-                    throw new VeldridException("Invalid GraphicsBackend: " + preferredBackend);
+                    throw new Exception("Invalid GraphicsBackend: " + preferredBackend);
             }
         }
 
