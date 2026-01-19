@@ -1,7 +1,8 @@
 ﻿using Veldrid.LowLevelRenderer.Core;
+using Veldrid.Vk;
 using Vulkan;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal class VkResourceFactory : ResourceFactory
     {

@@ -3,7 +3,7 @@ using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
 using Vulkan.Xlib;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     /// <summary>
     /// An object which can be used to create a VkSurfaceKHR.

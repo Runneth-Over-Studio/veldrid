@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Veldrid.LowLevelRenderer.Core;
-using Veldrid.Vk;
+using Veldrid.LowLevelRenderer.VulkanBackend;
 using Vulkan;
 
 namespace Veldrid

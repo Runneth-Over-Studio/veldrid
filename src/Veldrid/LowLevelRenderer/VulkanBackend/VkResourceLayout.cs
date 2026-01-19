@@ -1,9 +1,10 @@
 ﻿using Vulkan;
 using static Vulkan.VulkanNative;
-using static Veldrid.Vk.VulkanUtil;
+using static Veldrid.LowLevelRenderer.VulkanBackend.VulkanUtil;
 using Veldrid.LowLevelRenderer.Core;
+using Veldrid.Vk;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal unsafe class VkResourceLayout : ResourceLayout
     {

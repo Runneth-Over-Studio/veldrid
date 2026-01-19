@@ -2,7 +2,7 @@
 using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal abstract class VkFramebufferBase : Framebuffer
     {

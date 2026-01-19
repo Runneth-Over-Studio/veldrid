@@ -2,7 +2,7 @@
 using Vulkan;
 using static Vulkan.VulkanNative;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal unsafe class VkFence : Fence
     {

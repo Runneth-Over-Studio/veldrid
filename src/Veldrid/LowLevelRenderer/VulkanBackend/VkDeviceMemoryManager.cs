@@ -1,11 +1,11 @@
 ﻿using Vulkan;
 using static Vulkan.VulkanNative;
-using static Veldrid.Vk.VulkanUtil;
+using static Veldrid.LowLevelRenderer.VulkanBackend.VulkanUtil;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal unsafe class VkDeviceMemoryManager : IDisposable
     {

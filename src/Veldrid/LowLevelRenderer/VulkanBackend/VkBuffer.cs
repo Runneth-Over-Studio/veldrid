@@ -1,9 +1,9 @@
 ﻿using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
-using static Veldrid.Vk.VulkanUtil;
+using static Veldrid.LowLevelRenderer.VulkanBackend.VulkanUtil;
 using static Vulkan.VulkanNative;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal unsafe class VkBuffer : DeviceBuffer
     {

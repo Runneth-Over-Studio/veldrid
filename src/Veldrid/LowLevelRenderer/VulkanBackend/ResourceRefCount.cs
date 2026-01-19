@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal class ResourceRefCount
     {

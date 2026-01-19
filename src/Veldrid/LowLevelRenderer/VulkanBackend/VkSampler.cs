@@ -1,8 +1,9 @@
 ﻿using Veldrid.LowLevelRenderer.Core;
+using Veldrid.Vk;
 using Vulkan;
 using static Vulkan.VulkanNative;
 
-namespace Veldrid.Vk
+namespace Veldrid.LowLevelRenderer.VulkanBackend
 {
     internal unsafe class VkSampler : Sampler
     {

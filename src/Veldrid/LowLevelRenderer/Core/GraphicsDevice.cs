@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Veldrid.LowLevelRenderer.VulkanBackend;
 
 namespace Veldrid.LowLevelRenderer.Core;
 
@@ -891,7 +892,7 @@ public abstract class GraphicsDevice : IDisposable
         switch (backend)
         {
             case GraphicsBackend.Vulkan:
-                return Vk.VkGraphicsDevice.IsSupported();
+                return VkGraphicsDevice.IsSupported();
             default:
                 throw Illegal.Value<GraphicsBackend>();
         }
@@ -904,7 +905,7 @@ public abstract class GraphicsDevice : IDisposable
     /// <returns>A new <see cref="GraphicsDevice"/> using the Vulkan API.</returns>
     public static GraphicsDevice CreateVulkan(GraphicsDeviceOptions options)
     {
-        return new Vk.VkGraphicsDevice(options, null);
+        return new VkGraphicsDevice(options, null);
     }
 
     /// <summary>
@@ -915,7 +916,7 @@ public abstract class GraphicsDevice : IDisposable
     /// <returns>A new <see cref="GraphicsDevice"/> using the Vulkan API.</returns>
     public static GraphicsDevice CreateVulkan(GraphicsDeviceOptions options, VulkanDeviceOptions vkOptions)
     {
-        return new Vk.VkGraphicsDevice(options, null, vkOptions);
+        return new VkGraphicsDevice(options, null, vkOptions);
     }
 
     /// <summary>
@@ -926,7 +927,7 @@ public abstract class GraphicsDevice : IDisposable
     /// <returns>A new <see cref="GraphicsDevice"/> using the Vulkan API.</returns>
     public static GraphicsDevice CreateVulkan(GraphicsDeviceOptions options, SwapchainDescription swapchainDescription)
     {
-        return new Vk.VkGraphicsDevice(options, swapchainDescription);
+        return new VkGraphicsDevice(options, swapchainDescription);
     }
 
     /// <summary>
@@ -941,7 +942,7 @@ public abstract class GraphicsDevice : IDisposable
         SwapchainDescription swapchainDescription,
         VulkanDeviceOptions vkOptions)
     {
-        return new Vk.VkGraphicsDevice(options, swapchainDescription, vkOptions);
+        return new VkGraphicsDevice(options, swapchainDescription, vkOptions);
     }
 
     /// <summary>
@@ -952,7 +953,7 @@ public abstract class GraphicsDevice : IDisposable
     /// <param name="width">The initial width of the window.</param>
     /// <param name="height">The initial height of the window.</param>
     /// <returns>A new <see cref="GraphicsDevice"/> using the Vulkan API.</returns>
-    public static GraphicsDevice CreateVulkan(GraphicsDeviceOptions options, Vk.VkSurfaceSource surfaceSource, uint width, uint height)
+    public static GraphicsDevice CreateVulkan(GraphicsDeviceOptions options, VkSurfaceSource surfaceSource, uint width, uint height)
     {
         SwapchainDescription scDesc = new SwapchainDescription(
             surfaceSource.GetSurfaceSource(),
@@ -961,6 +962,6 @@ public abstract class GraphicsDevice : IDisposable
             options.SyncToVerticalBlank,
             options.SwapchainSrgbFormat);
 
-        return new Vk.VkGraphicsDevice(options, scDesc);
+        return new VkGraphicsDevice(options, scDesc);
     }
 }
