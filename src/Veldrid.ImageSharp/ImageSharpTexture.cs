@@ -1,4 +1,5 @@
 ﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Buffers;
@@ -196,7 +197,12 @@ namespace Veldrid.ImageSharp
             Configuration config = Configuration.Default.Clone();
             config.PreferContiguousImageBuffers = true;
 
-            return Image.Load<Rgba32>(config, path);
+            DecoderOptions options = new()
+            {
+                Configuration = config
+            };
+
+            return Image.Load<Rgba32>(options, path);
         }
 
         private static Image<Rgba32> CreateDefaultImage(Stream stream)
@@ -204,7 +210,12 @@ namespace Veldrid.ImageSharp
             Configuration config = Configuration.Default.Clone();
             config.PreferContiguousImageBuffers = true;
 
-            return Image.Load<Rgba32>(config, stream);
+            DecoderOptions options = new()
+            {
+                Configuration = config
+            };
+
+            return Image.Load<Rgba32>(options, stream);
         }
     }
 }

@@ -11,6 +11,11 @@
     <ProjectReference Include="..\Veldrid.SDL2\Veldrid.SDL2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.102" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.9.50" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Description>Helper classes for creating and managing application windows and user input.</Description>
     <PackageTags>Game SDL2 Window Input</PackageTags>

@@ -10,6 +10,11 @@
     <ProjectReference Include="..\Veldrid\Veldrid.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.102" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.9.50" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Description>Miscellaneous utility functions useful for Veldrid.</Description>
     <PackageTags>Game Graphics</PackageTags>
