@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.ImageSharp
 {
@@ -204,7 +205,7 @@ namespace Veldrid.ImageSharp
         {
             if (!img.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> mem))
             {
-                throw new VeldridException($"Unable to get contiguous pixel memory for {what}.");
+                throw new Exception($"Unable to get contiguous pixel memory for {what}.");
             }
             return mem;
         }

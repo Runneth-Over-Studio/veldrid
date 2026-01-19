@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using Veldrid.LowLevelRenderer.Core;
 using Veldrid.SPIRV;
 using Xunit;
 
@@ -56,7 +57,7 @@ void main()
             const float FillValue = 42.42f;
             const uint OutputTextureSize = 32;
 
-            using Shader computeShader = RF.CreateFromSpirv(new ShaderDescription(
+            using Shader computeShader = RF.CreateShader(new ShaderDescription(
                 ShaderStages.Compute,
                 Encoding.ASCII.GetBytes(shaderText),
                 "main"));

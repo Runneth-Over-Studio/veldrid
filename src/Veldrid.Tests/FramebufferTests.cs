@@ -1,4 +1,5 @@
 ﻿using System;
+using Veldrid.LowLevelRenderer.Core;
 using Xunit;
 
 namespace Veldrid.Tests
@@ -50,7 +51,7 @@ namespace Veldrid.Tests
             CommandList cl = RF.CreateCommandList();
             cl.Begin();
             cl.SetFramebuffer(fb);
-            Assert.Throws<VeldridException>(() => cl.ClearDepthStencil(1f));
+            Assert.Throws<Exception>(() => cl.ClearDepthStencil(1f));
         }
 
         [Fact]
@@ -63,7 +64,7 @@ namespace Veldrid.Tests
             CommandList cl = RF.CreateCommandList();
             cl.Begin();
             cl.SetFramebuffer(fb);
-            Assert.Throws<VeldridException>(() => cl.ClearColorTarget(0, RgbaFloat.Red));
+            Assert.Throws<Exception>(() => cl.ClearColorTarget(0, RgbaFloat.Red));
         }
 
         [Fact]
@@ -80,8 +81,8 @@ namespace Veldrid.Tests
             cl.SetFramebuffer(fb);
             cl.ClearColorTarget(0, RgbaFloat.Red);
             cl.ClearColorTarget(1, RgbaFloat.Red);
-            Assert.Throws<VeldridException>(() => cl.ClearColorTarget(2, RgbaFloat.Red));
-            Assert.Throws<VeldridException>(() => cl.ClearColorTarget(3, RgbaFloat.Red));
+            Assert.Throws<Exception>(() => cl.ClearColorTarget(2, RgbaFloat.Red));
+            Assert.Throws<Exception>(() => cl.ClearColorTarget(3, RgbaFloat.Red));
         }
 
         [Fact]

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Veldrid.LowLevelRenderer.Core;
+using Veldrid.LowLevelRenderer.VulkanBackend;
 using Veldrid.Sdl2;
 
 namespace Veldrid.StartupUtilities
@@ -78,7 +80,7 @@ namespace Veldrid.StartupUtilities
                 case WindowState.Hidden:
                     return SDL_WindowFlags.Hidden;
                 default:
-                    throw new VeldridException("Invalid WindowState: " + state);
+                    throw new Exception("Invalid WindowState: " + state);
             }
         }
 
@@ -98,7 +100,7 @@ namespace Veldrid.StartupUtilities
                 case GraphicsBackend.Vulkan:
                     return CreateVulkanGraphicsDevice(options, window);
                 default:
-                    throw new VeldridException("Invalid GraphicsBackend: " + preferredBackend);
+                    throw new Exception("Invalid GraphicsBackend: " + preferredBackend);
             }
         }
 
@@ -154,16 +156,16 @@ namespace Veldrid.StartupUtilities
             return gd;
         }
 
-        private static unsafe Veldrid.Vk.VkSurfaceSource GetSurfaceSource(SDL_SysWMinfo sysWmInfo)
+        private static unsafe VkSurfaceSource GetSurfaceSource(SDL_SysWMinfo sysWmInfo)
         {
             switch (sysWmInfo.subsystem)
             {
                 case SysWMType.Windows:
                     Win32WindowInfo w32Info = Unsafe.Read<Win32WindowInfo>(&sysWmInfo.info);
-                    return Vk.VkSurfaceSource.CreateWin32(w32Info.hinstance, w32Info.Sdl2Window);
+                    return VkSurfaceSource.CreateWin32(w32Info.hinstance, w32Info.Sdl2Window);
                 case SysWMType.X11:
                     X11WindowInfo x11Info = Unsafe.Read<X11WindowInfo>(&sysWmInfo.info);
-                    return Vk.VkSurfaceSource.CreateXlib(
+                    return VkSurfaceSource.CreateXlib(
                         (Vulkan.Xlib.Display*)x11Info.display,
                         new Vulkan.Xlib.Window() { Value = x11Info.Sdl2Window });
                 default:

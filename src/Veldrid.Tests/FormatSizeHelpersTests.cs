@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Veldrid.LowLevelRenderer.Core;
 using Xunit;
 
 namespace Veldrid.Tests
@@ -76,7 +77,7 @@ namespace Veldrid.Tests
         [MemberData(nameof(CompressedPixelFormatMemberData))]
         public void GetSizeInBytes_ThrowsForAllCompressedPixelFormats(PixelFormat format)
         {
-            Assert.ThrowsAny<VeldridException>(() => FormatSizeHelpers.GetSizeInBytes(format));
+            Assert.ThrowsAny<Exception>(() => FormatSizeHelpers.GetSizeInBytes(format));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Veldrid.LowLevelRenderer.Core;
 using Veldrid.SPIRV;
 
 namespace Veldrid.Tests
@@ -8,23 +9,19 @@ namespace Veldrid.Tests
     {
         public static Shader[] LoadVertexFragment(ResourceFactory factory, string setName)
         {
-            return factory.CreateFromSpirv(
-                new ShaderDescription(ShaderStages.Vertex, File.ReadAllBytes(GetPath(setName, ShaderStages.Vertex)), "main"),
-                new ShaderDescription(ShaderStages.Fragment, File.ReadAllBytes(GetPath(setName, ShaderStages.Fragment)), "main"),
-                new CrossCompileOptions(false, false, new SpecializationConstant[]
-                {
-                    new SpecializationConstant(100, false)
-                }));
+            return new[]
+            {
+                factory.CreateShader(
+                    new ShaderDescription(ShaderStages.Vertex, File.ReadAllBytes(GetPath(setName, ShaderStages.Vertex)), "main")),
+                factory.CreateShader(
+                    new ShaderDescription(ShaderStages.Fragment, File.ReadAllBytes(GetPath(setName, ShaderStages.Fragment)), "main"))
+            };
         }
 
         public static Shader LoadCompute(ResourceFactory factory, string setName)
         {
-            return factory.CreateFromSpirv(
-                new ShaderDescription(ShaderStages.Compute, File.ReadAllBytes(GetPath(setName, ShaderStages.Compute)), "main"),
-                new CrossCompileOptions(false, false, new SpecializationConstant[]
-                {
-                    new SpecializationConstant(100, false)
-                }));
+            return factory.CreateShader(
+                new ShaderDescription(ShaderStages.Compute, File.ReadAllBytes(GetPath(setName, ShaderStages.Compute)), "main"));
         }
 
         public static string GetPath(string setName, ShaderStages stage)

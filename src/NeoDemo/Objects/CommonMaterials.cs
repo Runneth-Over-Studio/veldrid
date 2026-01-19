@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Veldrid;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.NeoDemo.Objects
 {
