@@ -1,3 +1,5 @@
+using Veldrid.LowLevelRenderer.Core;
+
 namespace Veldrid.Utilities
 {
     public class DisposeCollectorResourceFactory : ResourceFactory

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Veldrid.LowLevelRenderer.Core;
 using Veldrid.Sdl2;
 
 namespace Veldrid.StartupUtilities

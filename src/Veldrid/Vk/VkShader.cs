@@ -2,6 +2,7 @@
 using static Vulkan.VulkanNative;
 using static Veldrid.Vk.VulkanUtil;
 using System;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.Vk
 {

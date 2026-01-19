@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.NeoDemo
 {

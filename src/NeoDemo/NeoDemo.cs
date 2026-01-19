@@ -9,6 +9,7 @@ using Veldrid.NeoDemo.Objects;
 using Veldrid.StartupUtilities;
 using Veldrid.Utilities;
 using Veldrid.Sdl2;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.NeoDemo
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Veldrid.LowLevelRenderer.Core;
 using Veldrid.Utilities;
 
 namespace Veldrid.NeoDemo

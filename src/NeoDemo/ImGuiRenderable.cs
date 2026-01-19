@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.NeoDemo
 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Veldrid.LowLevelRenderer.Core;
 using Vulkan;
 using static Veldrid.Vk.VulkanUtil;
 using static Vulkan.RawConstants;

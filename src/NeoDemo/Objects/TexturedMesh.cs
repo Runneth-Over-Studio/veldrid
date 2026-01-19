@@ -4,6 +4,7 @@ using System;
 using Veldrid.ImageSharp;
 using Veldrid.Utilities;
 using System.Collections.Generic;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.NeoDemo.Objects
 {

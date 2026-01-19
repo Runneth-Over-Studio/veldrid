@@ -2,6 +2,7 @@
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Veldrid.LowLevelRenderer.Core;
 using Veldrid.Sdl2;
 
 namespace Veldrid.NeoDemo

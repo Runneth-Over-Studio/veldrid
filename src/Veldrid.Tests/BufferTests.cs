@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Numerics;
+using Veldrid.LowLevelRenderer.Core;
 using Xunit;
 
 namespace Veldrid.Tests

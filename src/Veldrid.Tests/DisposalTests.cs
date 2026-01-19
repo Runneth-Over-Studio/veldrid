@@ -1,3 +1,4 @@
+using Veldrid.LowLevelRenderer.Core;
 using Xunit;
 
 namespace Veldrid.Tests

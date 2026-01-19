@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid.ImageSharp
 {

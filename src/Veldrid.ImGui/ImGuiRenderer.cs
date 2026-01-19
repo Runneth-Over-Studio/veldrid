@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
 using System.IO;
+using Veldrid.LowLevelRenderer.Core;
 
 namespace Veldrid
 {
