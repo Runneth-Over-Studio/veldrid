@@ -6,16 +6,17 @@ using System.IO;
 using System.Numerics;
 using Veldrid.ImageSharp;
 using Veldrid.NeoDemo.Objects;
-using Veldrid.StartupUtilities;
 using Veldrid.Utilities;
-using Veldrid.Sdl2;
 using Veldrid.LowLevelRenderer.Core;
+using Veldrid.PlatformIndependence.Windowing;
+using Silk.NET.Windowing;
+using Silk.NET.Input;
 
 namespace Veldrid.NeoDemo
 {
     public class NeoDemo
     {
-        private Sdl2Window _window;
+        private IWindow _window;
         private GraphicsDevice _gd;
         private Scene _scene;
         private readonly ImGuiRenderable _igRenderable;
@@ -56,24 +57,15 @@ namespace Veldrid.NeoDemo
                 Y = 50,
                 WindowWidth = 960,
                 WindowHeight = 540,
-                WindowInitialState = WindowState.Normal,
+                WindowInitialState = Silk.NET.Windowing.WindowState.Normal,
                 WindowTitle = "Veldrid NeoDemo"
             };
             GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false, ResourceBindingModel.Improved, true, true, _colorSrgb);
 #if DEBUG
             gdOptions.Debug = true;
 #endif
-            VeldridStartup.CreateWindowAndGraphicsDevice(
-                windowCI,
-                gdOptions,
-                 //VeldridStartup.GetPlatformDefaultBackend(),
-                 //GraphicsBackend.Metal,
-                 //GraphicsBackend.Vulkan,
-                //GraphicsBackend.OpenGL,
-                //GraphicsBackend.OpenGLES,
-                out _window,
-                out _gd);
-            _window.Resized += () => _windowResized = true;
+            VeldridStartup.CreateWindowAndGraphicsDevice(windowCI, gdOptions, out _window, out _gd);
+            _window.Resize += (size) => _windowResized = true;
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
             Sdl2ControllerTracker.CreateDefault(out _controllerTracker);
@@ -82,7 +74,7 @@ namespace Veldrid.NeoDemo
 
             _sc.SetCurrentScene(_scene);
 
-            _igRenderable = new ImGuiRenderable(_window.Width, _window.Height);
+            _igRenderable = new ImGuiRenderable(_window.Size.X, _window.Size.Y);
             _resizeHandled += (w, h) => _igRenderable.WindowResized(w, h);
             _scene.AddRenderable(_igRenderable);
             _scene.AddUpdateable(_igRenderable);
@@ -214,7 +206,7 @@ namespace Veldrid.NeoDemo
             long previousFrameTicks = 0;
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            while (_window.Exists)
+            while (!_window.IsClosing)
             {
                 long currentFrameTicks = sw.ElapsedTicks;
                 double deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
@@ -232,7 +224,7 @@ namespace Veldrid.NeoDemo
                 snapshot = _window.PumpEvents();
                 InputTracker.UpdateFrameInput(snapshot, _window);
                 Update((float)deltaSeconds);
-                if (!_window.Exists)
+                if (_window.IsClosing)
                 {
                     break;
                 }
@@ -286,7 +278,7 @@ namespace Veldrid.NeoDemo
                 }
                 if (ImGui.BeginMenu("Window"))
                 {
-                    bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
+                    bool isFullscreen = _window.WindowState == WindowState.Fullscreen;
                     if (ImGui.MenuItem("Fullscreen", "F11", isFullscreen, true))
                     {
                         ToggleFullscreenState();
@@ -309,16 +301,6 @@ namespace Veldrid.NeoDemo
                     if (ImGui.MenuItem("VSync", string.Empty, vsync, true))
                     {
                         _gd.SyncToVerticalBlank = !_gd.SyncToVerticalBlank;
-                    }
-                    bool resizable = _window.Resizable;
-                    if (ImGui.MenuItem("Resizable Window", string.Empty, resizable))
-                    {
-                        _window.Resizable = !_window.Resizable;
-                    }
-                    bool bordered = _window.BorderVisible;
-                    if (ImGui.MenuItem("Visible Window Border", string.Empty, bordered))
-                    {
-                        _window.BorderVisible = !_window.BorderVisible;
                     }
 
                     ImGui.EndMenu();
@@ -388,7 +370,7 @@ namespace Veldrid.NeoDemo
                         {
                             if (RenderDoc.Load(out _renderDoc))
                             {
-                                ChangeBackend(_gd.BackendType, forceRecreateWindow: true);
+                                ChangeBackend(forceRecreateWindow: true);
                             }
                         }
                     }
@@ -488,23 +470,6 @@ namespace Veldrid.NeoDemo
                 ToggleFullscreenState();
             }
 
-            if (InputTracker.GetKeyDown(Key.Keypad6))
-            {
-                _window.X += 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad4))
-            {
-                _window.X -= 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad8))
-            {
-                _window.Y += 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad2))
-            {
-                _window.Y -= 10;
-            }
-
             _window.Title = $"NeoDemo ({_gd.DeviceName}, {_gd.BackendType.ToString()})";
 
             if (_showImguiDemo)
@@ -559,15 +524,15 @@ namespace Veldrid.NeoDemo
 
         private void ToggleFullscreenState()
         {
-            bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
-            _window.WindowState = isFullscreen ? WindowState.Normal : WindowState.BorderlessFullScreen;
+            bool isFullscreen = _window.WindowState == WindowState.Fullscreen;
+            _window.WindowState = isFullscreen ? WindowState.Normal : WindowState.Fullscreen;
         }
 
         private void Draw()
         {
-            Debug.Assert(_window.Exists);
-            int width = _window.Width;
-            int height = _window.Height;
+            Debug.Assert(!_window.IsClosing);
+            int width = _window.Size.X;
+            int height = _window.Size.Y;
 
             if (_windowResized)
             {
@@ -608,8 +573,8 @@ namespace Veldrid.NeoDemo
             _gd.SwapBuffers();
         }
 
-        private void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
-        private void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
+        private void ChangeBackend() => ChangeBackend(false);
+        private void ChangeBackend(bool forceRecreateWindow)
         {
             DestroyAllObjects();
             bool syncToVBlank = _gd.SyncToVerticalBlank;
@@ -620,25 +585,27 @@ namespace Veldrid.NeoDemo
 
                 WindowCreateInfo windowCI = new WindowCreateInfo
                 {
-                    X = _window.X,
-                    Y = _window.Y,
-                    WindowWidth = _window.Width,
-                    WindowHeight = _window.Height,
+                    X = _window.Position.X,
+                    Y = _window.Position.Y,
+                    WindowWidth = _window.Size.X,
+                    WindowHeight = _window.Size.Y,
                     WindowInitialState = _window.WindowState,
                     WindowTitle = "Veldrid NeoDemo"
                 };
 
                 _window.Close();
 
-                _window = VeldridStartup.CreateWindow(ref windowCI);
-                _window.Resized += () => _windowResized = true;
+                //TODO: Not sure if I want to refactor IWindow not being a singleton service. I a real game, backends are not going to be switched on the fly like this. However, development tools might want this.
+                Console.WriteLine("Window recreation requested, but not supported at this time.");
+                //_window = VeldridStartup.CreateWindow(ref windowCI);
+                _window.Resize += (size) => _windowResized = true;
             }
 
             GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, syncToVBlank, ResourceBindingModel.Improved, true, true, _colorSrgb);
 #if DEBUG
             gdOptions.Debug = true;
 #endif
-            _gd = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
+            _gd = VeldridStartup.CreateGraphicsDevice(_window, gdOptions);
 
             _scene.Camera.UpdateBackend(_gd, _window);
 
@@ -654,6 +621,7 @@ namespace Veldrid.NeoDemo
             CommonMaterials.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             _gd.WaitForIdle();
+            _window.Dispose();
         }
 
         private void CreateAllObjects()

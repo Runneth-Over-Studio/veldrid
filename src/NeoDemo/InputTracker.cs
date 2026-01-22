@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Silk.NET.Input;
+using System.Collections.Generic;
 using System.Numerics;
 using Veldrid.Sdl2;
 

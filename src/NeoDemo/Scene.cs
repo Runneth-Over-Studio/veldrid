@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.NET.Windowing;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,7 +8,6 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Veldrid.LowLevelRenderer.Core;
 using Veldrid.NeoDemo.Objects;
-using Veldrid.Sdl2;
 using Veldrid.Utilities;
 
 namespace Veldrid.NeoDemo
@@ -42,7 +42,7 @@ namespace Veldrid.NeoDemo
         float _midCascadeLimit = 300;
         float _farCascadeLimit;
 
-        public Scene(GraphicsDevice gd, Sdl2Window window, Sdl2ControllerTracker controller)
+        public Scene(GraphicsDevice gd, IWindow window, Sdl2ControllerTracker controller)
         {
             _camera = new Camera(gd, window, controller);
             _farCascadeLimit = _camera.FarDistance;

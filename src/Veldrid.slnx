@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Veldrid/Veldrid.csproj" Id="60D56E4A-FA7A-4664-BEF0-0A29F41518BF" />
+  <Project Path="Veldrid.SDL2/Veldrid.SDL2.csproj" Id="8B11C7C1-EA56-4449-B7A4-ECBB17D566C3" />
+  <Project Path="NeoDemo/NeoDemo.csproj" Id="5359D055-6DD0-47FE-BA32-F6FDFAAFE999" />
+  <Project Path="Veldrid.StartupUtilities/Veldrid.StartupUtilities.csproj" Id="A2DA940F-F006-42AD-B4AA-50766B32A9EA" />
+  <Project Path="Veldrid.Utilities/Veldrid.Utilities.csproj" Id="3C8555BB-2BD9-4973-BFD9-DCAFDCD5955D" />
+  <Project Path="Veldrid.ImageSharp/Veldrid.ImageSharp.csproj" Id="B1AEBA69-C61C-41E7-9126-2087B3D5CAFA" />
+  <Project Path="Veldrid.ImGui/Veldrid.ImGui.csproj" Id="CC4A7F71-EF76-4D29-BF63-90E2F28D7C93" />
+  <Project Path="Veldrid.RenderDoc/Veldrid.RenderDoc.csproj" Id="AFAEF056-CAD3-4C32-AEC3-AAC35A251295" />		
+</Solution>

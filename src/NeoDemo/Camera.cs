@@ -1,9 +1,10 @@
 ﻿using ImGuiNET;
+using Silk.NET.Input;
+using Silk.NET.Windowing;
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Veldrid.LowLevelRenderer.Core;
-using Veldrid.Sdl2;
 
 namespace Veldrid.NeoDemo
 {
@@ -29,31 +30,31 @@ namespace Veldrid.NeoDemo
         private bool _useReverseDepth;
         private float _windowWidth;
         private float _windowHeight;
-        private Sdl2Window _window;
+        private IWindow _window;
         private Sdl2ControllerTracker _controller;
 
         public event Action<Matrix4x4> ProjectionChanged;
         public event Action<Matrix4x4> ViewChanged;
 
-        public Camera(GraphicsDevice gd, Sdl2Window window, Sdl2ControllerTracker controller)
+        public Camera(GraphicsDevice gd, IWindow window, Sdl2ControllerTracker controller)
         {
             _gd = gd;
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
             _window = window;
-            _windowWidth = window.Width;
-            _windowHeight = window.Height;
+            _windowWidth = window.Size.X;
+            _windowHeight = window.Size.Y;
             _controller = controller;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
 
-        public void UpdateBackend(GraphicsDevice gd, Sdl2Window window)
+        public void UpdateBackend(GraphicsDevice gd, IWindow window)
         {
             _gd = gd;
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
             _window = window;
-            _windowWidth = window.Width;
-            _windowHeight = window.Height;
+            _windowWidth = window.Size.X;
+            _windowHeight = window.Size.Y;
             UpdatePerspectiveMatrix();
         }
 

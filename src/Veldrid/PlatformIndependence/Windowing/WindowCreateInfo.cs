@@ -1,0 +1,13 @@
+﻿using Silk.NET.Windowing;
+
+namespace Veldrid.PlatformIndependence.Windowing;
+
+public struct WindowCreateInfo(int x, int y, int windowWidth, int windowHeight, WindowState windowInitialState, string windowTitle)
+{
+    public int X = x;
+    public int Y = y;
+    public int WindowWidth = windowWidth;
+    public int WindowHeight = windowHeight;
+    public WindowState WindowInitialState = windowInitialState;
+    public string WindowTitle = windowTitle;
+}
